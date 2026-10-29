@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { Bell, BookOpen, Bookmark, ChevronLeft, ChevronRight, Headphones, Heart, History, House, Lightbulb, ListFilter, MessageCircle, PenLine, Play, Search, SendHorizontal, Settings, Share2, Sparkles, UserRound, Volume2 } from "lucide-react";
-import { CATEGORIES, FREE_SUMMARY, SHOWCASE, VIDEO_BANNER, type Book } from "../content";
-import { APP, BookCover, CtaButton, LOGO, Waveform } from "./ui";
+import { Accessibility, Bell, BookOpen, Bookmark, ChevronLeft, CreditCard, Globe, Headphones, Heart, Highlighter, House, Lightbulb, ListFilter, MessageCircle, PenLine, Play, Search, SendHorizontal, Share2, Sparkles, UserRound, Volume2 } from "lucide-react";
+import { FREE_SUMMARY, SHOWCASE, VIDEO_BANNER, VIDEO_FEED, type Book } from "../content";
+import { APP, BookCover, categoryIcon, CtaButton, LOGO, Waveform } from "./ui";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 const rise = (delay: number) => ({
@@ -14,10 +14,10 @@ const rise = (delay: number) => ({
 // The phone tours the app's main screens, so the page shows more than books.
 const SCREENS = [
   { id: "read", nav: 0, describe: (b: Book) => `reading the ${b.title} summary` },
-  { id: "watch", nav: 0, describe: (b: Book) => `playing the ${b.title} video summary` },
+  { id: "watch", nav: 0, describe: () => `playing the ${VIDEO_FEED[0].title} video summary` },
   { id: "explore", nav: 1, describe: () => "the Explore tab with search, video summaries and categories" },
-  { id: "ask", nav: 2, describe: () => `Ask AI answering a question about ${FREE_SUMMARY.book.title}` },
-  { id: "profile", nav: 3, describe: () => "the profile with saved books and reading history" },
+  { id: "ask", nav: 2, describe: () => `Ask AI answering a question about ${FREE_SUMMARY.book.title}, with the free one-question limit` },
+  { id: "profile", nav: 3, describe: () => "the profile with subscription, preferences, liked books and highlights" },
 ] as const;
 type ScreenId = (typeof SCREENS)[number]["id"];
 
@@ -33,7 +33,7 @@ export function Landing({ onStart }: { onStart: () => void }) {
 
   useEffect(() => {
     if (!running) return;
-    const id = setInterval(() => setTick((t) => t + 1), 3800);
+    const id = setInterval(() => setTick((t) => t + 1), 2500);
     return () => clearInterval(id);
   }, [running]);
 
@@ -237,7 +237,7 @@ function Phone({ book, screen }: { book: Book; screen: ScreenId }) {
         <div className="relative min-h-0 flex-1">
           <AnimatePresence mode="wait" initial={false}>
             <motion.div
-              key={screen === "read" || screen === "watch" ? `${screen}-${book.id}` : screen}
+              key={screen === "read" ? `${screen}-${book.id}` : screen}
               className="absolute inset-0 flex flex-col"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -245,7 +245,7 @@ function Phone({ book, screen }: { book: Book; screen: ScreenId }) {
               transition={{ duration: 0.4, ease }}
             >
               {screen === "read" && <ReadScreen book={book} />}
-              {screen === "watch" && <WatchScreen book={book} />}
+              {screen === "watch" && <WatchScreen />}
               {screen === "explore" && <ExploreScreen />}
               {screen === "ask" && <AskScreen />}
               {screen === "profile" && <ProfileScreen />}
@@ -333,33 +333,42 @@ function ReadScreen({ book }: { book: Book }) {
   );
 }
 
-function WatchScreen({ book }: { book: Book }) {
-  const caption = book.excerpt[0].split(/(?<=[.!?])\s/)[0];
+/* A real BookSnap video summary: shows its poster frame, so the landing page
+   never downloads the video itself. */
+function WatchScreen() {
+  const video = VIDEO_FEED[0];
   return (
-    <div className="relative -mt-[12cqw] flex-1 overflow-hidden text-white">
-      <img src={book.cover} alt="" className="absolute inset-0 h-full w-full scale-125 object-cover opacity-60 blur-xl" />
-      <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/75" />
+    <div className="relative -mt-[12cqw] flex-1 overflow-hidden bg-black text-white">
+      <motion.img
+        src={video.poster}
+        alt=""
+        className="absolute inset-0 h-full w-full object-cover"
+        initial={{ scale: 1 }}
+        animate={{ scale: 1.08 }}
+        transition={{ duration: 2.5, ease: "easeInOut" }}
+      />
+      <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/70" />
       <span className="absolute left-[4cqw] top-[14cqw] grid size-[9cqw] place-items-center rounded-full bg-[#888B8B]/80">
         <ChevronLeft aria-hidden className="size-[5cqw]" />
       </span>
+      <span className="absolute right-[4cqw] top-[14cqw] grid size-[9cqw] place-items-center rounded-full bg-[#888B8B]/80">
+        <Volume2 aria-hidden className="size-[4.6cqw]" />
+      </span>
       <div className="absolute inset-x-[4cqw] top-[26cqw] h-[1cqw] overflow-hidden rounded-full bg-white/25">
-        <motion.div className="h-full rounded-full bg-[#EFB100]" initial={{ width: "8%" }} animate={{ width: "70%" }} transition={{ duration: 3.6, ease: "linear" }} />
-      </div>
-      <div className="absolute inset-x-[7cqw] top-[34cqw] flex flex-col items-center gap-[6cqw]">
-        <motion.div className="w-[44cqw]" initial={{ scale: 1 }} animate={{ scale: 1.06 }} transition={{ duration: 3.8, ease: "easeInOut" }}>
-          <BookCover book={book} className="shadow-[0_6cqw_12cqw_-3cqw_rgba(0,0,0,0.7)]" />
-        </motion.div>
-        <p className="text-center text-[1.05em] font-bold leading-snug [text-shadow:0_1cqw_4cqw_rgba(0,0,0,0.6)]">{caption}</p>
+        <motion.div className="h-full rounded-full bg-[#EFB100]" initial={{ width: "8%" }} animate={{ width: "45%" }} transition={{ duration: 2.4, ease: "linear" }} />
       </div>
       <div className="absolute inset-x-[5cqw] bottom-[5cqw]">
-        <div className="font-bold leading-tight">{book.title}</div>
+        <div className="font-bold leading-tight">{video.title}</div>
         <div className="mt-[1cqw] flex items-center gap-[1.5cqw] text-[0.8em] text-white/75">
-          {book.author} · <Play aria-hidden className="size-[2.8cqw] fill-current" /> Video summary
+          {video.author} · <Play aria-hidden className="size-[2.8cqw] fill-current" /> Video summary
         </div>
       </div>
     </div>
   );
 }
+
+// A few of the app's Explore categories, for the mockup.
+const APP_CATEGORIES = ["Non-fiction", "Adventure", "Historical", "Money & Wealth", "Upgrade Skill", "Drama", "Self-Improvement", "Romance", "Psychology", "Fiction"];
 
 function ExploreScreen() {
   return (
@@ -370,54 +379,59 @@ function ExploreScreen() {
       </div>
       <div className="relative mt-[4cqw] overflow-hidden rounded-[4cqw]">
         <img src={VIDEO_BANNER} alt="" className="block h-[28cqw] w-full object-cover" />
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/25 text-white">
-          <span className="mb-[1.5cqw] grid size-[10cqw] place-items-center rounded-full bg-[#276B54]/85">
+        <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
+          <span className="mb-[1.5cqw] grid size-[10cqw] place-items-center rounded-full bg-[#3C6E57]">
             <Play aria-hidden className="ml-[0.5cqw] size-[5cqw] fill-current" />
           </span>
           <span className="text-[0.85em] font-bold">Video Summary</span>
-          <span className="text-[0.7em] text-white/85">Watch short book summaries</span>
+          <span className="text-[0.7em] text-white/90">Watch short book summaries</span>
         </div>
       </div>
-      <div className="mt-[5cqw] text-[1em] font-bold text-[#45474B]">Categories</div>
-      <div className="mt-[2.5cqw] flex gap-[2cqw] overflow-hidden whitespace-nowrap">
-        {CATEGORIES.map((c, i) => (
-          <span
-            key={c}
-            className="rounded-full border px-[3cqw] py-[1.2cqw] text-[0.72em] font-semibold"
-            style={i === 0 ? { backgroundColor: APP.greenDark, borderColor: APP.greenDark, color: "#fff" } : { borderColor: "#BDBDBD", color: "#45474B" }}
-          >
-            {c}
-          </span>
-        ))}
+      <div className="mt-[4.5cqw] text-[1.05em] font-bold text-[#45474B]">Categories</div>
+      <div className="mt-[2.5cqw] flex flex-wrap gap-[1.6cqw]">
+        {APP_CATEGORIES.map((c) => {
+          const Icon = categoryIcon(c);
+          const on = c === "Romance";
+          return (
+            <span
+              key={c}
+              className="flex items-center gap-[1.2cqw] rounded-full border-[0.4cqw] px-[2.4cqw] py-[1cqw] text-[0.7em] font-medium"
+              style={on ? { backgroundColor: "#3C6E57", borderColor: "#3C6E57", color: "#fff" } : { borderColor: "#3C6E57", color: "#2F5A47" }}
+            >
+              <Icon aria-hidden className="size-[3.2cqw] fill-current" strokeWidth={1.6} />
+              {c}
+            </span>
+          );
+        })}
       </div>
-      <div className="mt-[5cqw] text-[1em] font-bold text-[#45474B]">All books</div>
+      <div className="mt-[4.5cqw] text-[1.05em] font-bold text-[#45474B]">Results</div>
       <div className="mt-[2.5cqw] grid grid-cols-3 gap-[3cqw]">
-        {SHOWCASE.map((b) => (
-          <div key={b.id}>
-            <BookCover book={b} />
-            <div className="mt-[1cqw] truncate text-[0.68em] font-semibold">{b.title}</div>
-          </div>
+        {SHOWCASE.slice(3).concat(SHOWCASE.slice(0, 1)).map((b) => (
+          <BookCover key={b.id} book={b} />
         ))}
       </div>
     </div>
   );
 }
 
+/* Ask AI chat, including the free tier's one-question limit, as in the app. */
 function AskScreen() {
   const { book, ask } = FREE_SUMMARY;
   return (
-    <div className="flex flex-1 flex-col overflow-hidden px-[5cqw]">
-      <div className="flex items-center gap-[2cqw] pb-[3cqw] text-[1.05em] font-extrabold">
-        <Sparkles aria-hidden className="size-[5cqw] text-gold-ink" /> ASK.AI
+    <div className="flex flex-1 flex-col overflow-hidden bg-[#E3E6E7]">
+      <div className="flex items-center gap-[3cqw] rounded-b-[4cqw] bg-white px-[4cqw] pb-[3cqw] pt-[1cqw]">
+        <ChevronLeft aria-hidden className="size-[5cqw] text-[#45474B]" />
+        <BookCover book={book} className="w-[10cqw]" />
+        <div className="min-w-0">
+          <div className="truncate text-[0.95em] font-bold">{book.title}</div>
+          <div className="flex items-center gap-[1.5cqw] text-[0.75em] font-medium text-[#D62E2E]">
+            1/1 questions used <span className="size-[1.6cqw] rounded-full bg-[#3CC264]" />
+          </div>
+        </div>
       </div>
-      <div className="flex items-center gap-[2.5cqw] rounded-[3cqw] bg-[#F2F2F2] p-[2cqw]">
-        <BookCover book={book} className="w-[8cqw]" />
-        <span className="text-[0.8em] font-bold">{book.title}</span>
-      </div>
-      <div className="mt-[4cqw] flex flex-col gap-[3cqw]">
+      <div className="flex flex-col gap-[3cqw] px-[4cqw] pt-[4cqw]">
         <motion.div
-          className="self-end rounded-[4cqw] rounded-br-[1cqw] px-[3.5cqw] py-[2.5cqw] text-[0.85em] font-semibold text-white"
-          style={{ backgroundColor: APP.greenDark }}
+          className="ml-[10cqw] self-end rounded-[4cqw] bg-[#3C6E57] px-[3.5cqw] py-[2.5cqw] text-[0.82em] leading-snug text-white"
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2, duration: 0.4 }}
@@ -425,7 +439,7 @@ function AskScreen() {
           {ask[1].q}
         </motion.div>
         <motion.div
-          className="max-w-[90%] rounded-[4cqw] rounded-bl-[1cqw] bg-[#F2F2F2] px-[3.5cqw] py-[2.5cqw] text-[0.85em] leading-snug"
+          className="mr-[10cqw] rounded-[4cqw] bg-white px-[3.5cqw] py-[2.5cqw] text-[0.82em] leading-snug"
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6, duration: 0.4 }}
@@ -433,15 +447,22 @@ function AskScreen() {
           <TypedText text={ask[1].a} />
         </motion.div>
       </div>
-      <div className="mt-auto flex flex-col gap-[2cqw] pb-[3cqw]">
-        {[ask[0].q, ask[2].q].map((q) => (
-          <span key={q} className="self-start rounded-full border px-[3cqw] py-[1.5cqw] text-[0.72em] font-semibold" style={{ borderColor: "#D6D6D6", color: APP.greenDark }}>
-            {q}
-          </span>
-        ))}
-        <div className="mt-[1cqw] flex items-center justify-between rounded-full border border-[#CFCFCF] py-[1cqw] pl-[4cqw] pr-[1cqw] text-[0.8em] text-[#8A8A8A]">
-          Ask anything about this book…
-          <span className="grid size-[8cqw] place-items-center rounded-full text-white" style={{ backgroundColor: APP.greenDark }}>
+      <div className="mt-auto px-[4cqw] pb-[3cqw]">
+        <motion.div
+          className="flex items-center gap-[2cqw] rounded-[4cqw] border-[0.4cqw] border-[#E6B33D] bg-white p-[3cqw]"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.3, duration: 0.4 }}
+        >
+          <div className="min-w-0 flex-1">
+            <div className="text-[0.85em] font-bold">Free limit reached</div>
+            <div className="text-[0.72em] text-[#6B7280]">Upgrade to keep asking</div>
+          </div>
+          <span className="rounded-full bg-[#E6B33D] px-[3cqw] py-[1.5cqw] text-[0.75em] font-bold text-white">Upgrade</span>
+        </motion.div>
+        <div className="mt-[3cqw] flex items-center justify-between rounded-full bg-[#F1F2F3] py-[1cqw] pl-[4cqw] pr-[1cqw] text-[0.78em] text-[#A0A4A8]">
+          Question limit reached
+          <span className="grid size-[8cqw] place-items-center rounded-full bg-[#F2DFAE] text-[#9BB5A8]">
             <SendHorizontal aria-hidden className="size-[4cqw]" />
           </span>
         </div>
@@ -450,48 +471,34 @@ function AskScreen() {
   );
 }
 
+/* Profile, as in the app. The account shown is a placeholder, not a real user. */
 function ProfileScreen() {
-  const rows: [typeof History, string][] = [
-    [Bookmark, "My Library"],
-    [History, "Reading history"],
-    [Bell, "Notifications"],
-    [Settings, "Preferences"],
+  const rows: [typeof UserRound, string][] = [
+    [UserRound, "User Profile"],
+    [CreditCard, "Manage Subscription"],
+    [BookOpen, "Reading Preference"],
+    [Accessibility, "Accessibility"],
+    [Bell, "Notification Settings"],
+    [Globe, "Language Preference"],
+    [Heart, "Book You've Liked"],
+    [Highlighter, "My Highlights"],
   ];
   return (
-    <div className="flex-1 overflow-hidden px-[5cqw]">
-      <div className="flex items-center gap-[3.5cqw] pb-[4cqw] pt-[1cqw]">
-        <span className="grid size-[14cqw] place-items-center rounded-full text-[1.1em] font-extrabold text-white" style={{ backgroundColor: APP.greenDark }}>
-          <UserRound aria-hidden className="size-[7cqw]" />
-        </span>
-        <div>
-          <div className="text-[1.05em] font-extrabold">Your profile</div>
-          <div className="text-[0.75em] text-[#5F5F5F]">Account, preferences and history</div>
+    <div className="flex-1 overflow-hidden bg-[#F8FAF9] px-[4cqw]">
+      <div className="flex items-center gap-[4cqw] rounded-[4cqw] bg-[#ECF5EF] p-[4cqw]">
+        <span className="grid size-[17cqw] shrink-0 place-items-center rounded-full bg-[#E07A2F] text-[1.9em] text-white">A</span>
+        <div className="min-w-0">
+          <div className="truncate text-[1.1em] font-bold text-[#111827]">Alex Morgan</div>
+          <div className="truncate text-[0.75em] text-[#6B7280]">alex@example.com</div>
+          <span className="mt-[1.5cqw] inline-block rounded-full bg-[#FBDC5E] px-[3cqw] py-[1cqw] text-[0.72em] font-semibold text-[#2F5A47]">Free Plan</span>
         </div>
       </div>
-      <div className="text-[0.75em] font-extrabold uppercase tracking-[0.08em] text-[#5F5F5F]">Continue reading</div>
-      <div className="mt-[2.5cqw] flex flex-col gap-[2.5cqw]">
-        {SHOWCASE.slice(0, 2).map((b, i) => (
-          <div key={b.id} className="flex items-center gap-[3cqw] rounded-[3cqw] bg-[#F2F2F2] p-[2cqw]">
-            <BookCover book={b} className="w-[9cqw]" />
-            <div className="min-w-0 flex-1">
-              <div className="truncate text-[0.82em] font-bold">{b.title}</div>
-              <div className="mt-[1.5cqw] h-[1.2cqw] overflow-hidden rounded-full bg-[#DADADA]">
-                <motion.div className="h-full rounded-full" style={{ backgroundColor: APP.green }} initial={{ width: 0 }} animate={{ width: i ? "35%" : "70%" }} transition={{ duration: 0.9, ease, delay: 0.2 }} />
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-      <div className="mt-[4cqw] text-[0.75em] font-extrabold uppercase tracking-[0.08em] text-[#5F5F5F]">Saved</div>
-      <div className="mt-[2.5cqw] grid grid-cols-4 gap-[2.5cqw]">
-        {SHOWCASE.slice(1).map((b) => <BookCover key={b.id} book={b} />)}
-      </div>
-      <div className="mt-[3cqw] divide-y divide-[#EDEDED]">
+      <div className="mt-[4cqw] text-[1em] font-bold text-[#111827]">User Information</div>
+      <div className="mt-[2.5cqw] divide-y divide-white rounded-[4cqw] bg-[#ECF5EF]">
         {rows.map(([Icon, label]) => (
-          <div key={label} className="flex items-center gap-[3cqw] py-[2.8cqw] text-[0.85em] font-semibold">
-            <Icon aria-hidden className="size-[4.6cqw]" style={{ color: APP.greenDark }} />
-            <span className="flex-1">{label}</span>
-            <ChevronRight aria-hidden className="size-[4cqw] text-[#9A9A9A]" />
+          <div key={label} className="flex items-center gap-[3cqw] px-[4cqw] py-[2.7cqw] text-[0.82em] text-[#111827]">
+            <Icon aria-hidden className="size-[4.6cqw]" strokeWidth={1.7} />
+            {label}
           </div>
         ))}
       </div>
@@ -506,8 +513,8 @@ function TypedText({ text, className }: { text: string; className?: string }) {
     if (reduce) return;
     let tick: ReturnType<typeof setInterval> | undefined;
     const start = setTimeout(() => {
-      tick = setInterval(() => setN((c) => Math.min(text.length, c + 2)), 28);
-    }, 500);
+      tick = setInterval(() => setN((c) => Math.min(text.length, c + 4)), 20);
+    }, 250);
     return () => {
       clearTimeout(start);
       clearInterval(tick);

@@ -1,9 +1,22 @@
 import { motion } from "motion/react";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Brain, BriefcaseBusiness, Cloud, Feather, Fingerprint, Heart, PersonStanding, Rocket, WandSparkles, type LucideIcon } from "lucide-react";
 import type { CSSProperties, ReactNode } from "react";
 import type { Book } from "../content";
 
 export const LOGO = "/booksnap-logo.png";
+
+// Category icons, matching the chips in the BookSnap app's Explore tab.
+const ICONS: [RegExp, LucideIcon][] = [
+  [/business|money|wealth/i, BriefcaseBusiness],
+  [/skill|psycholog/i, Brain],
+  [/drama|romance/i, Heart],
+  [/histor|literar|biograph|memoir/i, Feather],
+  [/fiction$|adventure|sci-fi|apocalyp/i, Rocket],
+  [/dystop|philosoph/i, Cloud],
+  [/fantasy/i, WandSparkles],
+  [/crime|thriller/i, Fingerprint],
+];
+export const categoryIcon = (name: string): LucideIcon => (/non-fiction/i.test(name) ? PersonStanding : ICONS.find(([re]) => re.test(name))?.[1] ?? PersonStanding);
 
 // Colours of the BookSnap mobile app UI (reader, action bar, bottom nav).
 export const APP = { green: "#3E9B78", greenDark: "#237A5B", yellow: "#F2C916", chrome: "#48484B", ink: "#2A2A2A" };

@@ -4,6 +4,7 @@ import networkEffects from "../imports/covers/network-effects.jpg";
 import callMeByYourName from "../imports/covers/call-me-by-your-name.jpg";
 import timeTravelersWife from "../imports/covers/time-travelers-wife.jpg";
 export { default as VIDEO_BANNER } from "../imports/video-summary.jpg";
+import meBeforeYouPoster from "../imports/videos/me-before-you.jpg";
 
 // ── Go-live switches ─────────────────────────────────────────────
 // Real checkout (Stripe Checkout, Xendit, app store…). It should redirect back to
@@ -143,7 +144,7 @@ export const SHOWCASE: Book[] = [
 const freeBook = SHOWCASE.find((b) => b.id === "zero-to-one")!;
 
 export const CATEGORIES = [...new Set(SHOWCASE.map((b) => b.category))];
-// Video summaries play in full for the free book; others play a short teaser.
+// Videos marked `free` play in full; the rest play a short teaser, then ask for full access.
 export const VIDEO_TEASER_SECONDS = 8;
 
 export const FREE_SUMMARY = {
@@ -185,3 +186,29 @@ export const FREE_SUMMARY = {
     },
   ],
 };
+
+// ── Video summaries ──────────────────────────────────────────────
+// The feed behind Explore → Video Summary. Real BookSnap videos come first; books
+// without a video URL fall back to an animated visual breakdown of the excerpt.
+export type VideoItem = {
+  id: string;
+  title: string;
+  author: string;
+  src?: string;
+  poster?: string;
+  book?: Book;
+  free: boolean;
+};
+
+export const VIDEO_FEED: VideoItem[] = [
+  {
+    id: "me-before-you",
+    title: "Me Before You",
+    author: "Jojo Moyes",
+    // ~204 MB, 2.5 min, 1440x2550. Ask for a compressed, "faststart" MP4 before running ads.
+    src: "https://be.booksnap.ai/uploads/videos/files/3798e820-c7b5-40d7-af0a-ac494e1ef583_1776411337.mp4",
+    poster: meBeforeYouPoster,
+    free: true,
+  },
+  ...SHOWCASE.map((b) => ({ id: b.id, title: b.title, author: b.author, src: b.video || undefined, book: b, free: b.id === freeBook.id })),
+];
