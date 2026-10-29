@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { Accessibility, Bell, BookOpen, Bookmark, ChevronLeft, CreditCard, Globe, Headphones, Heart, Highlighter, House, Lightbulb, ListFilter, MessageCircle, PenLine, Play, Search, SendHorizontal, Share2, Sparkles, UserRound, Volume2 } from "lucide-react";
+import { Bell, BookOpen, Bookmark, ChevronLeft, CreditCard, Globe, Headphones, Headset, Heart, Highlighter, House, Info, Lightbulb, ListFilter, LogOut, MessageCircle, MessageCircleQuestion, PenLine, Play, Search, SendHorizontal, Settings, Share2, Sparkles, UserRound, Volume2 } from "lucide-react";
+import profileAvatar from "../../imports/profile-avatar.jpg";
 import { FREE_SUMMARY, SHOWCASE, VIDEO_BANNER, VIDEO_FEED, type Book } from "../content";
 import { APP, BookCover, categoryIcon, CtaButton, LOGO, Waveform } from "./ui";
 
@@ -17,7 +18,7 @@ const SCREENS = [
   { id: "watch", nav: 0, describe: () => `playing the ${VIDEO_FEED[0].title} video summary` },
   { id: "explore", nav: 1, describe: () => "the Explore tab with search, video summaries and categories" },
   { id: "ask", nav: 2, describe: () => `Ask AI answering a question about ${FREE_SUMMARY.book.title}, with the free one-question limit` },
-  { id: "profile", nav: 3, describe: () => "the profile with subscription, preferences, liked books and highlights" },
+  { id: "profile", nav: 3, describe: () => "the profile with subscription, preferences, liked books, highlights and support" },
 ] as const;
 type ScreenId = (typeof SCREENS)[number]["id"];
 
@@ -471,36 +472,49 @@ function AskScreen() {
   );
 }
 
-/* Profile, as in the app. The account shown is a placeholder, not a real user. */
+/* Profile, from the BookSnap design. The account shown is a sample persona. */
 function ProfileScreen() {
-  const rows: [typeof UserRound, string][] = [
-    [UserRound, "User Profile"],
-    [CreditCard, "Manage Subscription"],
-    [BookOpen, "Reading Preference"],
-    [Accessibility, "Accessibility"],
-    [Bell, "Notification Settings"],
-    [Globe, "Language Preference"],
-    [Heart, "Book You've Liked"],
-    [Highlighter, "My Highlights"],
+  const sections: [string, [typeof UserRound, string][]][] = [
+    ["User Information", [
+      [UserRound, "User Profile"],
+      [CreditCard, "Manage Subscription"],
+      [BookOpen, "Reading Preference"],
+      [Globe, "Language Preference"],
+      [Heart, "Books You've Liked"],
+      [Highlighter, "My Highlights"],
+    ]],
+    ["Help & Support", [
+      [MessageCircleQuestion, "FAQs"],
+      [Headset, "Customer Support"],
+      [Info, "Accessibility"],
+      [Settings, "Troubleshooting"],
+    ]],
   ];
   return (
-    <div className="flex-1 overflow-hidden bg-[#F8FAF9] px-[4cqw]">
-      <div className="flex items-center gap-[4cqw] rounded-[4cqw] bg-[#ECF5EF] p-[4cqw]">
-        <span className="grid size-[17cqw] shrink-0 place-items-center rounded-full bg-[#E07A2F] text-[1.9em] text-white">A</span>
+    <div className="flex-1 overflow-hidden bg-[#E3E6E7] px-[4cqw] pt-[1cqw]">
+      <div className="flex items-center gap-[3cqw] rounded-[4.5cqw] bg-[#EDF5F0] p-[3cqw]">
+        <img src={profileAvatar} alt="" className="size-[15cqw] shrink-0 rounded-full object-cover" />
         <div className="min-w-0">
-          <div className="truncate text-[1.1em] font-bold text-[#111827]">Alex Morgan</div>
-          <div className="truncate text-[0.75em] text-[#6B7280]">alex@example.com</div>
-          <span className="mt-[1.5cqw] inline-block rounded-full bg-[#FBDC5E] px-[3cqw] py-[1cqw] text-[0.72em] font-semibold text-[#2F5A47]">Free Plan</span>
+          <div className="truncate text-[0.95em] font-bold text-[#111827]">Alicia Wang</div>
+          <div className="truncate text-[0.7em] text-[#6B7280]">alicia@example.com</div>
+          <span className="mt-[1cqw] inline-block rounded-full bg-[#E8B53C] px-[2.6cqw] py-[0.6cqw] text-[0.68em] font-semibold text-[#1F4D3A]">Premium Plan</span>
         </div>
       </div>
-      <div className="mt-[4cqw] text-[1em] font-bold text-[#111827]">User Information</div>
-      <div className="mt-[2.5cqw] divide-y divide-white rounded-[4cqw] bg-[#ECF5EF]">
-        {rows.map(([Icon, label]) => (
-          <div key={label} className="flex items-center gap-[3cqw] px-[4cqw] py-[2.7cqw] text-[0.82em] text-[#111827]">
-            <Icon aria-hidden className="size-[4.6cqw]" strokeWidth={1.7} />
-            {label}
+      {sections.map(([title, rows]) => (
+        <div key={title}>
+          <div className="mt-[3.5cqw] text-[0.9em] font-semibold text-[#111827]">{title}</div>
+          <div className="mt-[2cqw] rounded-[4.5cqw] bg-[#EDF5F0] px-[4cqw] py-[0.6cqw]">
+            {rows.map(([Icon, label], i) => (
+              <div key={label} className={`flex items-center gap-[3cqw] py-[2cqw] text-[0.76em] text-[#111827] ${i ? "border-t-[0.3cqw] border-[#3C6E57]" : ""}`}>
+                <Icon aria-hidden className="size-[4.6cqw]" strokeWidth={1.5} />
+                {label}
+              </div>
+            ))}
           </div>
-        ))}
+        </div>
+      ))}
+      <div className="mt-[3.5cqw] flex items-center justify-center gap-[2cqw] rounded-full bg-[#3C6E57] py-[2.6cqw] text-[0.8em] font-medium text-white">
+        Sign Out <LogOut aria-hidden className="size-[4cqw]" />
       </div>
     </div>
   );

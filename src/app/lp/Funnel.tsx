@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from "react";
-import { AnimatePresence, motion } from "motion/react";
+import { motion } from "motion/react";
 import { BookOpen, Check, CircleCheck, Headphones, Sparkles, X } from "lucide-react";
 import { track } from "../analytics";
 import { APP_URL, CHECKOUT_URL, FREE_SUMMARY, PLANS, TRIAL_DAYS, type Plan } from "../content";
@@ -15,24 +15,19 @@ export const screenMotion = {
 };
 
 /* ── Paywall ───────────────────────────────────────────────────── */
-export function Paywall({ onClose, onSubscribed }: { onClose: () => void; onSubscribed: (plan: Plan["id"]) => void }) {
+export function Paywall({ onClose }: { onClose: () => void }) {
   const [yearly, setYearly] = useState(true);
   const [planId, setPlanId] = useState<Plan["id"]>("premium");
-  const [demoOpen, setDemoOpen] = useState(false);
   const plan = PLANS.find((p) => p.id === planId)!;
   const billing = yearly ? "yearly" : "monthly";
   const terms = yearly ? `${plan.yearlyTotal} billed yearly` : `${plan.monthly} billed monthly`;
 
   const checkout = () => {
     track("checkout_start", { plan: plan.id, billing });
-    if (CHECKOUT_URL) {
-      const url = new URL(CHECKOUT_URL);
-      url.searchParams.set("plan", plan.id);
-      url.searchParams.set("billing", billing);
-      window.location.href = url.toString();
-    } else {
-      setDemoOpen(true);
-    }
+    const url = new URL(CHECKOUT_URL);
+    url.searchParams.set("plan", plan.id);
+    url.searchParams.set("billing", billing);
+    window.location.href = url.toString();
   };
 
   return (
@@ -116,69 +111,14 @@ export function Paywall({ onClose, onSubscribed }: { onClose: () => void; onSubs
         <p className="mt-3 text-center text-[12.5px] text-white/75">{TRIAL_DAYS} days free, then {terms}.</p>
       </footer>
 
-      <AnimatePresence>
-        {demoOpen && (
-          <DemoCheckout
-            plan={plan}
-            billing={billing}
-            terms={terms}
-            onCancel={() => setDemoOpen(false)}
-            onPaid={() => {
-              track("subscription_success", { plan: plan.id, billing, demo: true });
-              onSubscribed(plan.id);
-            }}
-          />
-        )}
-      </AnimatePresence>
-    </motion.div>
-  );
-}
-
-/* Shown only while CHECKOUT_URL is empty. Collects nothing and charges nothing. */
-function DemoCheckout({ plan, billing, terms, onCancel, onPaid }: { plan: Plan; billing: string; terms: string; onCancel: () => void; onPaid: () => void }) {
-  return (
-    <motion.div className="absolute inset-0 z-10 grid place-items-end bg-black/50 p-0 sm:place-items-center sm:p-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-      <motion.div
-        role="alertdialog"
-        aria-label="Demo checkout"
-        className="w-full max-w-[440px] rounded-t-[28px] bg-paper p-6 text-forest sm:rounded-[28px]"
-        initial={{ y: 40, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        exit={{ y: 40, opacity: 0 }}
-        transition={{ duration: 0.4, ease }}
-      >
-        <span className="rounded-full bg-[#ffdad6] px-3 py-1 text-[11px] font-extrabold uppercase tracking-[0.12em] text-[#8c1d18]">Demo checkout</span>
-        <h3 className="mt-3 font-display text-[22px] font-extrabold">Confirm your trial</h3>
-        <dl className="mt-4 divide-y divide-forest/10 rounded-2xl bg-cream text-[14px]">
-          {[
-            ["Plan", `${plan.name} · ${billing}`],
-            ["Due today", "$0.00"],
-            ["After trial", terms],
-          ].map(([k, v]) => (
-            <div key={k} className="flex justify-between gap-4 px-4 py-3">
-              <dt className="text-forest/75">{k}</dt>
-              <dd className="text-right font-bold">{v}</dd>
-            </div>
-          ))}
-        </dl>
-        <p className="mt-4 text-[13px] leading-relaxed text-forest/75">
-          This is a demonstration. No payment details are collected and nothing is charged. Connect a real checkout by setting <code className="rounded bg-cream px-1">CHECKOUT_URL</code> in <code className="rounded bg-cream px-1">src/app/content.ts</code>.
-        </p>
-        <div className="mt-5 flex gap-3">
-          <button type="button" onClick={onCancel} className="flex-1 cursor-pointer rounded-full border border-forest/50 py-3.5 text-[15px] font-bold hover:bg-forest/5">Back</button>
-          <CtaButton onClick={onPaid} arrow={false} className="flex-[2] py-3.5 text-[15px]">Simulate payment</CtaButton>
-        </div>
-      </motion.div>
     </motion.div>
   );
 }
 
 /* ── Success ───────────────────────────────────────────────────── */
-export function Success({ demo, onRestart }: { demo: boolean; onRestart: () => void }) {
-  const [note, setNote] = useState(false);
+export function Success() {
   const start = () => {
-    if (APP_URL) window.location.href = APP_URL;
-    else setNote(true);
+    window.location.href = APP_URL;
   };
   return (
     <motion.div {...screenMotion} role="dialog" aria-modal="true" aria-label="Subscription confirmed" className="fixed inset-0 grid place-items-center overflow-hidden bg-cream px-5 text-forest">
@@ -187,16 +127,9 @@ export function Success({ demo, onRestart }: { demo: boolean; onRestart: () => v
         <motion.div initial={{ scale: 0.4, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: "spring", stiffness: 260, damping: 16, delay: 0.15 }}>
           <CircleCheck aria-hidden className="size-20 text-forest" strokeWidth={1.6} />
         </motion.div>
-        {demo && <span className="mt-4 rounded-full bg-[#ffdad6] px-3 py-1 text-[11px] font-extrabold uppercase tracking-[0.12em] text-[#8c1d18]">Demo</span>}
         <h1 className="mt-4 font-display text-[clamp(32px,8vw,48px)] font-extrabold leading-[1.05] tracking-[-0.035em]">You're in.</h1>
         <p className="mt-3 text-[17px] leading-relaxed text-forest/75">Full access is unlocked. Your {TRIAL_DAYS}-day free trial has started. Your next book is one tap away.</p>
         <CtaButton onClick={start} className="mt-7 w-full px-8 py-[17px] text-[17px] sm:w-auto">Start Reading</CtaButton>
-        {note && <p className="mt-3 text-[13px] text-forest/75">Demo: this opens the full BookSnap experience once <code className="rounded bg-white px-1">APP_URL</code> is set.</p>}
-        {demo && (
-          <button type="button" onClick={onRestart} className="mt-4 min-h-11 cursor-pointer px-4 text-[14px] font-semibold text-forest/75 underline underline-offset-4 hover:text-forest">
-            Restart demo
-          </button>
-        )}
       </div>
     </motion.div>
   );

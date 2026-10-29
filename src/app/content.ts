@@ -6,13 +6,14 @@ import timeTravelersWife from "../imports/covers/time-travelers-wife.jpg";
 export { default as VIDEO_BANNER } from "../imports/video-summary.jpg";
 import meBeforeYouPoster from "../imports/videos/me-before-you.jpg";
 
-// ── Go-live switches ─────────────────────────────────────────────
-// Real checkout (Stripe Checkout, Xendit, app store…). It should redirect back to
-// `/?checkout=success&plan=<id>` so the success event fires. While empty, the
-// paywall opens a clearly labelled demo checkout instead — nothing is charged.
-export const CHECKOUT_URL = "";
-// Where "Start reading" sends subscribers after payment (web app or app store link).
-export const APP_URL = "";
+// ── Destinations ─────────────────────────────────────────────────
+// "Start free trial" hands off to BookSnap's own trial sign-up. If a checkout ever
+// redirects back to `/?checkout=success&plan=<id>`, the success screen and event fire.
+export const CHECKOUT_URL = "https://apps.booksnap.ai/en/start-free-trial";
+// Where "Start reading" sends subscribers.
+export const APP_URL = "https://apps.booksnap.ai/en/home";
+// For visitors who already have an account.
+export const SIGN_IN_URL = "https://apps.booksnap.ai/en/sign-in";
 
 // Taken from the existing BookSnap pricing design and FAQ. Confirm before launch.
 export const TRIAL_DAYS = 3;
@@ -144,9 +145,6 @@ export const SHOWCASE: Book[] = [
 const freeBook = SHOWCASE.find((b) => b.id === "zero-to-one")!;
 
 export const CATEGORIES = [...new Set(SHOWCASE.map((b) => b.category))];
-// Videos marked `free` play in full; the rest play a short teaser, then ask for full access.
-export const VIDEO_TEASER_SECONDS = 8;
-
 export const FREE_SUMMARY = {
   book: freeBook,
   freePages: 3,
@@ -188,16 +186,14 @@ export const FREE_SUMMARY = {
 };
 
 // ── Video summaries ──────────────────────────────────────────────
-// The feed behind Explore → Video Summary. Real BookSnap videos come first; books
-// without a video URL fall back to an animated visual breakdown of the excerpt.
+// Real BookSnap videos. The landing page shows the poster; in the preview,
+// watching a video asks the visitor to log in or start a trial.
 export type VideoItem = {
   id: string;
   title: string;
   author: string;
-  src?: string;
-  poster?: string;
-  book?: Book;
-  free: boolean;
+  src: string;
+  poster: string;
 };
 
 export const VIDEO_FEED: VideoItem[] = [
@@ -208,7 +204,5 @@ export const VIDEO_FEED: VideoItem[] = [
     // ~204 MB, 2.5 min, 1440x2550. Ask for a compressed, "faststart" MP4 before running ads.
     src: "https://be.booksnap.ai/uploads/videos/files/3798e820-c7b5-40d7-af0a-ac494e1ef583_1776411337.mp4",
     poster: meBeforeYouPoster,
-    free: true,
   },
-  ...SHOWCASE.map((b) => ({ id: b.id, title: b.title, author: b.author, src: b.video || undefined, book: b, free: b.id === freeBook.id })),
 ];

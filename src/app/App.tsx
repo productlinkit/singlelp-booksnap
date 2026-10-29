@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, MotionConfig } from "motion/react";
 import "./components/landing.css";
 import { track } from "./analytics";
-import { FREE_SUMMARY, type Plan } from "./content";
+import { FREE_SUMMARY } from "./content";
 import { Landing } from "./lp/Landing";
 import { Paywall, Success } from "./lp/Funnel";
 import { Reader } from "./lp/Reader";
@@ -11,7 +11,6 @@ type Stage = "landing" | "preview" | "paywall" | "success";
 
 export default function App() {
   const [stage, setStage] = useState<Stage>("landing");
-  const [demoSuccess, setDemoSuccess] = useState(false);
 
   useEffect(() => {
     // A real checkout redirects back to /?checkout=success&plan=<id>.
@@ -48,21 +47,10 @@ export default function App() {
           <Paywall
             key="paywall"
             onClose={() => setStage("landing")}
-            onSubscribed={(_plan: Plan["id"]) => {
-              setDemoSuccess(true);
-              setStage("success");
-            }}
           />
         )}
         {stage === "success" && (
-          <Success
-            key="success"
-            demo={demoSuccess}
-            onRestart={() => {
-              setDemoSuccess(false);
-              setStage("landing");
-            }}
-          />
+          <Success key="success" />
         )}
       </AnimatePresence>
     </MotionConfig>
