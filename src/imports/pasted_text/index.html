@@ -1,0 +1,864 @@
+<!DOCTYPE html><html class="scroll-smooth" lang="en" style=""><head></head><body class="bg-surface text-on-surface font-body-md antialiased overflow-x-hidden">```html
+
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>BookSnap - Read Smarter, One Snap at a Time</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+                "primary-fixed-dim": "#9ed2b9",
+                "on-tertiary-fixed-variant": "#584400",
+                "surface-container-high": "#eae7ea",
+                "on-secondary-fixed-variant": "#00522f",
+                "on-primary-container": "#89bda4",
+                "on-tertiary": "#ffffff",
+                "secondary-fixed-dim": "#88d7a5",
+                "on-tertiary-fixed": "#241a00",
+                "surface": "#fcf8fb",
+                "surface-container-highest": "#e4e2e4",
+                "on-error-container": "#93000a",
+                "inverse-primary": "#9ed2b9",
+                "outline": "#717974",
+                "on-primary-fixed-variant": "#1d4f3c",
+                "on-background": "#1b1b1d",
+                "surface-container-lowest": "#ffffff",
+                "on-error": "#ffffff",
+                "inverse-on-surface": "#f3f0f2",
+                "surface-container-low": "#f6f3f5",
+                "on-secondary-container": "#217248",
+                "on-tertiary-container": "#503d00",
+                "on-surface-variant": "#404944",
+                "surface-tint": "#366853",
+                "secondary-container": "#a4f4bf",
+                "surface-bright": "#fcf8fb",
+                "primary-container": "#1a4d3a",
+                "on-primary-fixed": "#002115",
+                "outline-variant": "#c0c9c2",
+                "error-container": "#ffdad6",
+                "inverse-surface": "#303032",
+                "on-primary": "#ffffff",
+                "surface-container": "#f0edef",
+                "tertiary-fixed-dim": "#eec13c",
+                "tertiary": "#755b00",
+                "secondary": "#186c42",
+                "primary": "#003625",
+                "surface-dim": "#dcd9dc",
+                "on-secondary": "#ffffff",
+                "surface-variant": "#e4e2e4",
+                "secondary-fixed": "#a4f4bf",
+                "background": "#fcf8fb",
+                "on-surface": "#1b1b1d",
+                "on-secondary-fixed": "#002110",
+                "tertiary-fixed": "#ffe08f",
+                "primary-fixed": "#b9eed4",
+                "error": "#ba1a1a"
+        },
+        "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px"
+        },
+        "spacing": {
+                "gutter-sm": "12px",
+                "stack-sm": "8px",
+                "container-margin": "20px",
+                "stack-xs": "4px",
+                "stack-md": "16px",
+                "stack-lg": "24px",
+                "section-gap": "40px"
+        },
+        "fontFamily": {
+                "label-sm": [
+                        "Inter"
+                ],
+                "headline-lg-mobile": [
+                        "Plus Jakarta Sans"
+                ],
+                "body-md": [
+                        "Inter"
+                ],
+                "headline-md": [
+                        "Plus Jakarta Sans"
+                ],
+                "headline-lg": [
+                        "Plus Jakarta Sans"
+                ],
+                "body-lg": [
+                        "Inter"
+                ],
+                "label-md": [
+                        "Inter"
+                ],
+                "display-lg": [
+                        "Plus Jakarta Sans"
+                ]
+        },
+        "fontSize": {
+                "label-sm": [
+                        "12px",
+                        {
+                                "lineHeight": "16px",
+                                "fontWeight": "500"
+                        }
+                ],
+                "headline-lg-mobile": [
+                        "28px",
+                        {
+                                "lineHeight": "34px",
+                                "fontWeight": "700"
+                        }
+                ],
+                "body-md": [
+                        "16px",
+                        {
+                                "lineHeight": "24px",
+                                "fontWeight": "400"
+                        }
+                ],
+                "headline-md": [
+                        "24px",
+                        {
+                                "lineHeight": "32px",
+                                "fontWeight": "600"
+                        }
+                ],
+                "headline-lg": [
+                        "32px",
+                        {
+                                "lineHeight": "40px",
+                                "letterSpacing": "-0.01em",
+                                "fontWeight": "700"
+                        }
+                ],
+                "body-lg": [
+                        "18px",
+                        {
+                                "lineHeight": "28px",
+                                "fontWeight": "400"
+                        }
+                ],
+                "label-md": [
+                        "14px",
+                        {
+                                "lineHeight": "20px",
+                                "letterSpacing": "0.01em",
+                                "fontWeight": "600"
+                        }
+                ],
+                "display-lg": [
+                        "48px",
+                        {
+                                "lineHeight": "56px",
+                                "letterSpacing": "-0.02em",
+                                "fontWeight": "700"
+                        }
+                ]
+        }
+},
+    },
+  }
+</script>
+<style>
+        .glass-card {
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 8px 32px rgba(0, 54, 37, 0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .glass-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0, 54, 37, 0.12);
+        }
+        .text-gold { color: #d0a61f; }
+        .bg-gold { background-color: #d0a61f; }
+        .text-deep-green { color: #1a4d3a; }
+        .bg-deep-green { background-color: #1a4d3a; }
+        
+        .fade-up {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .fade-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .stagger-1 { transition-delay: 0.1s; }
+        .stagger-2 { transition-delay: 0.2s; }
+        .stagger-3 { transition-delay: 0.3s; }
+        .stagger-4 { transition-delay: 0.4s; }
+
+        @keyframes float-main {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-12px); }
+        }
+        @keyframes float-organic-1 {
+            0%, 100% { transform: translateY(0px) rotate(-6deg); }
+            50% { transform: translateY(-15px) rotate(-4deg); }
+        }
+        @keyframes float-organic-2 {
+            0%, 100% { transform: translateY(0px) rotate(3deg); }
+            50% { transform: translateY(-10px) rotate(5deg); }
+        }
+        @keyframes float-organic-3 {
+            0%, 100% { transform: translateY(0px) rotate(6deg); }
+            50% { transform: translateY(-18px) rotate(4deg); }
+        }
+        @keyframes float-organic-4 {
+            0%, 100% { transform: translateY(0px) rotate(-3deg); }
+            50% { transform: translateY(-12px) rotate(-5deg); }
+        }
+        @keyframes float-organic-5 {
+            0%, 100% { transform: translateY(0px) rotate(-2deg); }
+            50% { transform: translateY(-8px) rotate(-1deg); }
+        }
+
+        .animate-float-main { animation: float-main 6s ease-in-out infinite; }
+        .animate-float-1 { animation: float-organic-1 5s ease-in-out infinite; }
+        .animate-float-2 { animation: float-organic-2 6.5s ease-in-out infinite 0.5s; }
+        .animate-float-3 { animation: float-organic-3 5.5s ease-in-out infinite 1s; }
+        .animate-float-4 { animation: float-organic-4 7s ease-in-out infinite 1.5s; }
+        .animate-float-5 { animation: float-organic-5 8s ease-in-out infinite 2s; }
+
+        .btn-hover-lift {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .btn-hover-lift:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 54, 37, 0.15);
+        }
+
+        .nav-scrolled {
+            background: rgba(249, 247, 242, 0.85);
+            backdrop-filter: blur(16px);
+            border-bottom-color: rgba(192, 201, 194, 0.3);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        }
+        .dark .nav-scrolled {
+            background: rgba(26, 77, 58, 0.6);
+            border-bottom-color: rgba(255, 255, 255, 0.15);
+        }
+        
+        .line-draw {
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 1000;
+            transition: stroke-dashoffset 2s ease-out;
+        }
+        .line-draw.visible {
+            stroke-dashoffset: 0;
+        }
+
+        /* Carousel Styles */
+        .carousel-wrapper {
+            overflow: hidden;
+            width: 100%;
+            position: relative;
+        }
+        .carousel-track {
+            display: flex;
+            gap: 2rem;
+            padding: 4rem 50vw; /* padding to allow first/last to center */
+            width: max-content;
+            animation: scroll 40s linear infinite;
+        }
+        
+        .carousel-track:hover {
+            animation-play-state: paused;
+        }
+
+        @keyframes scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(calc(-100% / 2)); } /* scroll half because of duplication */
+        }
+
+        .carousel-card {
+            transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            transform: scale(0.9);
+            opacity: 0.7;
+        }
+        
+        .carousel-card.center-focus {
+            transform: scale(1.1);
+            opacity: 1;
+            box-shadow: 0 0 40px 15px rgba(255, 255, 255, 0.6), 0 25px 50px -12px rgba(26, 77, 58, 0.3);
+            border-color: #ffffff;
+            background-color: #ffffff;
+            z-index: 10;
+        }
+        
+        /* Playful staggered layout for inactive cards */
+        .carousel-card:not(.center-focus):nth-child(even) {
+            transform: scale(0.9) translateY(15px) rotate(3deg);
+        }
+        .carousel-card:not(.center-focus):nth-child(odd) {
+            transform: scale(0.9) translateY(-10px) rotate(-2deg);
+        }
+
+        
+        .nav-dot {
+            transition: width 0.3s ease, background-color 0.3s ease;
+        }
+        .nav-dot.active {
+            width: 2rem;
+            background-color: #ffffff;
+        }
+        .nav-dot:not(.active) {
+            background-color: rgba(255,255,255,0.4);
+        }
+    </style>
+<!-- TopNavBar -->
+<nav class="bg-transparent border-transparent shadow-none fixed top-0 left-0 w-full z-50 transition-all duration-500" id="main-nav">
+<div class="flex justify-between items-center px-container-margin mx-auto bg-surface-container-lowest rounded-full shadow-lg mt-4 py-3 w-fit px-8 gap-[100px]">
+<a class="flex items-center gap-2" href="#">
+<img alt="BookSnap Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBkeISwAl82X1Rirs10VojoJsJGIKaPoPyu_7ohwU2GtxLoL5fQkKq8SrQadgmURAhnPw1dIkuUYXWuyjUOUFKJHQCIZg74yhimGUuGXkKFQKtu-65mZPJ3fyPkzveYOFHtWzaIXUJNWtN2Ub852JLKISSALazX7qsa_tAd2GNI20oXayjmho0eiB_FpntsLUL8vsKt4bFkz7Vxla7syokk06XSv8__CG1kVjxxO0jlij9xURFo2AlSGiaGXFhB8_hZikbLusnhG_dI">
+</a>
+<div class="hidden md:flex items-center gap-8"><a class="font-label-md text-label-md text-primary-container font-medium hover:text-tertiary-container transition-colors" href="#why-choose-us">Why Choose Us</a><a class="font-label-md text-label-md text-primary-container font-medium hover:text-tertiary-container transition-colors" href="#features">Features</a><a class="font-label-md text-label-md text-primary-container font-medium hover:text-tertiary-container transition-colors" href="#how-it-works">How it Works</a><a class="font-label-md text-label-md text-primary-container font-medium hover:text-tertiary-container transition-colors" href="#pricing">Pricing</a><a class="font-label-md text-label-md text-primary-container font-medium hover:text-tertiary-container transition-colors" href="#testimonials">Testimonials</a></div>
+<div class="flex items-center gap-stack-md">
+<a class="font-label-md text-label-md bg-primary-container text-white px-6 py-2.5 rounded-full btn-hover-lift" href="#">Get Started</a>
+</div>
+</div>
+</nav>
+<!-- Hero Section -->
+<section class="pt-32 pb-20 max-w-7xl mx-auto text-center relative overflow-hidden px-28">
+<h1 class="font-display-lg text-display-lg text-primary-container mb-6 max-w-4xl mx-auto leading-tight fade-up stagger-1 visible">
+            Read Smarter,<br class="hidden md:block"> One Snap at a Time
+        </h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant mb-10 max-w-2xl mx-auto fade-up stagger-2 visible">
+            Unlock the world's best ideas with bite-sized, AI-powered summaries designed for lifelong learners.
+        </p>
+<div class="flex flex-col sm:flex-row justify-center items-center gap-4 mb-20 fade-up stagger-3 visible">
+<button class="bg-tertiary-container text-primary-container font-label-md text-label-md px-8 py-4 rounded-full btn-hover-lift">
+                Start Reading Free
+            </button>
+<button class="glass-card text-primary-container font-label-md text-label-md px-8 py-4 rounded-full hover:bg-surface-container-lowest/60">
+                Explore Features
+            </button>
+</div>
+<!-- Phone Mockup & Floating Cards -->
+<div class="relative max-w-5xl mx-auto h-[700px] flex justify-center items-center fade-up stagger-3 visible">
+<!-- Background Glow/Depth -->
+<div class="absolute inset-0 bg-gradient-to-b from-transparent via-[#1A4D3A]/5 to-transparent rounded-full blur-3xl opacity-50"></div>
+<!-- Left Mockup (Tucked behind, angled) -->
+<div class="absolute left-[15%] top-[15%] w-[240px] h-[480px] bg-inverse-surface rounded-[32px] border-4 border-inverse-surface shadow-xl z-0 transform -rotate-6 opacity-80 animate-float-2">
+<div class="w-full h-full rounded-[28px] overflow-hidden">
+<img alt="App interface" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDGoKk3EdhqViSsHuBa8ASEfouiUXWlIzRxbrcoYyB_VSlfbmN5Oro0pefBxjDTV1BfoQKzN1Wr95c634JZatNX4llDkyGAkhdYnf3SjQeRjt9PU0SnX6fkLbsmeCPDm8iHoCHp_1CbXwsssBHYg8kvCSjzaL8V27tI1ZdVKQq8aqKq0L-SAmGYkJmBCofgVWJI21KXKO1YrzUXnC80JrV463Kgh_SQWStYe7wp2jTm1bFjQcXalrc7ltmVJnNpJza1d2EpOA4T7acrrp0">
+</div>
+</div>
+<!-- Right Mockup (Tucked behind, opposite angle, vertical offset) -->
+<div class="absolute right-[15%] bottom-[10%] w-[240px] h-[480px] bg-inverse-surface rounded-[32px] border-4 border-inverse-surface shadow-xl z-0 transform rotate-12 opacity-80 animate-float-4">
+<div class="w-full h-full bg-surface-container rounded-[28px] overflow-hidden">
+<img alt="App interface" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuASwSnotG1i2ceCI3ylWrGIo9RxU5Zs-cN0VQ08_F7M_Zczjivdy5cu9nwwTtUnl9NBYuT3ioFXLkFI2w5JyLSwerpg8PkqZx5SAbgbnhAX8SC4EQgiB0glHRDSNQxnvt0K4y07I2nIOI1heulxJ303jYy02oregW7ONNh5FUOEv08XJZElh4HxLxWrgPdfCO7SegE5v2TE6oYkJWAJCs15lhZTcQPs5-a75ZbpkbPYCwk18TQ8BDMVJiSDiC-CSl4P38pJ9nF4Ib4uJ9A">
+</div>
+</div>
+<!-- Center Mockup (Large, forward, upright) -->
+<div class="w-[300px] h-[600px] bg-inverse-surface rounded-[40px] border-8 border-inverse-surface shadow-2xl relative z-20 overflow-hidden animate-float-main">
+<img alt="Book reading app interface" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuASjyb5CkpjzL90wWum4Wdlpc-unMrqcYHvLp67KTaRz1htwUFAzD-j1WMCVCVos4z1MQIvw3birsBr2nl5gaoqh7dpuxBhmpDE3fuC9a8f-EVHwhIh8Vr_ZMvz9dhF1cxkFtxmAN4hg8yvvHFwnKBVqMIYBAaYyJvzyTtr4oCOBcjZSAAlhkjdiVvXmd49XNHkeyfEW_e2G2k1LQYrk25Mkrn6Vzo6nMKBsJDTgv9bmLJY_kQYjZwQqjoYwrmoHAGFi-_8uVh1nGlDxMo">
+</div>
+<!-- Redistributed Floating Cards & Chips -->
+<div class="absolute inset-0 z-30 pointer-events-none hidden md:block">
+<!-- StoryFlow - Top Left -->
+<div class="glass-card absolute top-10 left-[5%] p-4 rounded-[12px] animate-float-1 pointer-events-auto transform -rotate-3 scale-90 shadow-lg">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary-container bg-secondary-container p-2 rounded-full">swipe</span>
+<span class="font-label-md text-label-md text-primary-container font-bold">StoryFlow Summaries</span>
+</div>
+</div>
+<!-- Audio Recaps - Bottom Left -->
+<div class="glass-card absolute bottom-20 left-[8%] p-4 rounded-[12px] animate-float-2 pointer-events-auto transform rotate-6 shadow-xl">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary-container bg-tertiary-fixed p-2 rounded-full">headphones</span>
+<span class="font-label-md text-label-md text-primary-container font-bold">Audio Quick Recaps</span>
+</div>
+</div>
+<!-- Ask AI - Top Right -->
+<div class="glass-card absolute top-24 right-[5%] p-4 rounded-[12px] animate-float-3 pointer-events-auto transform rotate-3 scale-110 shadow-2xl">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary-container bg-primary-fixed p-2 rounded-full">lightbulb</span>
+<span class="font-label-md text-label-md text-primary-container font-bold">Ask AI Feature</span>
+</div>
+</div>
+<!-- Smart Recommendations - Bottom Right -->
+<div class="glass-card absolute bottom-32 right-[8%] p-4 rounded-[12px] animate-float-4 pointer-events-auto transform -rotate-6 shadow-lg blur-[0.5px]">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary-container bg-error-container p-2 rounded-full">star</span>
+<span class="font-label-md text-label-md text-primary-container font-bold">Smart Recommendations</span>
+</div>
+</div>
+<!-- 500+ Summaries - Center Top -->
+<div class="glass-card absolute top-0 left-1/2 -translate-x-1/2 p-3 rounded-[12px] animate-float-5 pointer-events-auto z-40 shadow-md">
+<span class="font-label-sm text-label-sm text-primary-container font-bold px-4 py-1">500+ Book Summaries</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Features Carousel Section -->
+<section class="mx-auto bg-primary rounded-[48px] overflow-hidden relative shadow-2xl py-[100px] my-4 max-w-[1150px] px-12" id="features">
+<!-- Floating Accents -->
+<div class="absolute top-10 left-10 text-tertiary-fixed opacity-40 text-6xl material-symbols-outlined transform -rotate-12 pointer-events-none animate-float-1">menu_book</div>
+<div class="absolute bottom-20 right-10 text-tertiary-fixed opacity-40 text-6xl material-symbols-outlined transform rotate-12 pointer-events-none animate-float-2">lightbulb</div>
+<div class="absolute top-1/4 right-1/4 text-primary-fixed opacity-30 text-4xl material-symbols-outlined transform rotate-45 pointer-events-none animate-float-3">star</div>
+<div class="absolute bottom-1/4 left-1/4 text-secondary-fixed opacity-30 text-5xl material-symbols-outlined transform -rotate-45 pointer-events-none animate-float-4">headphones</div>
+<div class="text-left mb-12 fade-up visible px-16 relative z-10 md:px-24">
+<h2 class="font-headline-lg text-surface-container-lowest mb-4 text-5xl md:text-6xl font-extrabold tracking-tight">Master any topic in minutes</h2>
+</div>
+<div class="relative w-full mx-auto fade-up stagger-1 visible px-4 z-10 carousel-wrapper" id="carouselWrapper">
+<!-- Carousel Track -->
+<div class="carousel-track" id="carouselTrack">
+<!-- Original Set of Cards -->
+<!-- Card 1 -->
+<div class="carousel-card min-w-[300px] md:min-w-[360px] max-w-[360px] bg-surface-container-lowest p-10 rounded-[32px] border-2 border-outline-variant/20 flex-shrink-0 cursor-pointer relative overflow-hidden group center-focus">
+<div class="absolute top-0 right-0 w-40 h-40 bg-secondary-container/30 rounded-bl-full -mr-20 -mt-20 transition-transform duration-500 group-hover:scale-125"></div>
+<span class="material-symbols-outlined text-primary-container bg-secondary-container p-4 rounded-2xl text-4xl mb-8 inline-block relative z-10 shadow-sm">swipe</span>
+<h3 class="font-headline-md text-primary-container mb-4 relative z-10 font-extrabold text-2xl md:text-3xl tracking-tight leading-tight">StoryFlow<br>Summaries</h3>
+<p class="font-body-md text-on-surface-variant relative z-10 mt-6 pt-6 border-t border-outline-variant/20">Get the key insights from bestselling non-fiction books in fraction of the time.</p>
+</div>
+<!-- Card 2 -->
+<div class="carousel-card min-w-[300px] md:min-w-[360px] max-w-[360px] bg-surface-container-lowest p-10 rounded-[32px] border-2 border-outline-variant/20 flex-shrink-0 cursor-pointer relative overflow-hidden group">
+<div class="absolute top-0 right-0 w-40 h-40 bg-tertiary-fixed/30 rounded-bl-full -mr-20 -mt-20 transition-transform duration-500 group-hover:scale-125"></div>
+<span class="material-symbols-outlined text-primary-container bg-tertiary-fixed p-4 rounded-2xl text-4xl mb-8 inline-block relative z-10 shadow-sm">headphones</span>
+<h3 class="font-headline-md text-primary-container mb-4 relative z-10 font-extrabold text-2xl md:text-3xl tracking-tight leading-tight">Audio Quick<br>Recaps</h3>
+<p class="font-body-md text-on-surface-variant relative z-10 mt-6 pt-6 border-t border-outline-variant/20">Listen to professional voice actors narrate summaries while you commute or workout.</p>
+</div>
+<!-- Card 3 -->
+<div class="carousel-card min-w-[300px] md:min-w-[360px] max-w-[360px] bg-surface-container-lowest p-10 rounded-[32px] border-2 border-outline-variant/20 flex-shrink-0 cursor-pointer relative overflow-hidden group">
+<div class="absolute top-0 right-0 w-40 h-40 bg-primary-fixed/30 rounded-bl-full -mr-20 -mt-20 transition-transform duration-500 group-hover:scale-125"></div>
+<span class="material-symbols-outlined text-primary-container bg-primary-fixed p-4 rounded-2xl text-4xl mb-8 inline-block relative z-10 shadow-sm">lightbulb</span>
+<h3 class="font-headline-md text-primary-container mb-4 relative z-10 font-extrabold text-2xl md:text-3xl tracking-tight leading-tight">Ask AI<br>Feature</h3>
+<p class="font-body-md text-on-surface-variant relative z-10 mt-6 pt-6 border-t border-outline-variant/20">Ask questions about any book and get immediate, context-aware answers.</p>
+</div>
+<!-- Card 4 -->
+<div class="carousel-card min-w-[300px] md:min-w-[360px] max-w-[360px] bg-surface-container-lowest p-10 rounded-[32px] border-2 border-outline-variant/20 flex-shrink-0 cursor-pointer relative overflow-hidden group">
+<div class="absolute top-0 right-0 w-40 h-40 bg-error-container/40 rounded-bl-full -mr-20 -mt-20 transition-transform duration-500 group-hover:scale-125"></div>
+<span class="material-symbols-outlined text-primary-container bg-error-container p-4 rounded-2xl text-4xl mb-8 inline-block relative z-10 shadow-sm">star</span>
+<h3 class="font-headline-md text-primary-container mb-4 relative z-10 font-extrabold text-2xl md:text-3xl tracking-tight leading-tight">Smart<br>Recommendations</h3>
+<p class="font-body-md text-on-surface-variant relative z-10 mt-6 pt-6 border-t border-outline-variant/20">Personalized suggestions tailored to your reading habits and goals.</p>
+</div>
+<!-- Card 5 -->
+<div class="carousel-card min-w-[300px] md:min-w-[360px] max-w-[360px] bg-surface-container-lowest p-10 rounded-[32px] border-2 border-outline-variant/20 flex-shrink-0 cursor-pointer relative overflow-hidden group">
+<div class="absolute top-0 right-0 w-40 h-40 bg-tertiary-container/30 rounded-bl-full -mr-20 -mt-20 transition-transform duration-500 group-hover:scale-125"></div>
+<span class="material-symbols-outlined text-primary-container bg-tertiary-container p-4 rounded-2xl text-4xl mb-8 inline-block relative z-10 shadow-sm">menu_book</span>
+<h3 class="font-headline-md text-primary-container mb-4 relative z-10 font-extrabold text-2xl md:text-3xl tracking-tight leading-tight">Growing<br>Library</h3>
+<p class="font-body-md text-on-surface-variant relative z-10 mt-6 pt-6 border-t border-outline-variant/20">Explore thousands of titles across 20+ categories, with new books added daily.</p>
+</div>
+<!-- Duplicated Set for Infinite Scroll -->
+<!-- Card 1 -->
+<div class="carousel-card min-w-[300px] md:min-w-[360px] max-w-[360px] bg-surface-container-lowest p-10 rounded-[32px] border-2 border-outline-variant/20 flex-shrink-0 cursor-pointer relative overflow-hidden group">
+<div class="absolute top-0 right-0 w-40 h-40 bg-secondary-container/30 rounded-bl-full -mr-20 -mt-20 transition-transform duration-500 group-hover:scale-125"></div>
+<span class="material-symbols-outlined text-primary-container bg-secondary-container p-4 rounded-2xl text-4xl mb-8 inline-block relative z-10 shadow-sm">swipe</span>
+<h3 class="font-headline-md text-primary-container mb-4 relative z-10 font-extrabold text-2xl md:text-3xl tracking-tight leading-tight">StoryFlow<br>Summaries</h3>
+<p class="font-body-md text-on-surface-variant relative z-10 mt-6 pt-6 border-t border-outline-variant/20">Get the key insights from bestselling non-fiction books in fraction of the time.</p>
+</div>
+<!-- Card 2 -->
+<div class="carousel-card min-w-[300px] md:min-w-[360px] max-w-[360px] bg-surface-container-lowest p-10 rounded-[32px] border-2 border-outline-variant/20 flex-shrink-0 cursor-pointer relative overflow-hidden group">
+<div class="absolute top-0 right-0 w-40 h-40 bg-tertiary-fixed/30 rounded-bl-full -mr-20 -mt-20 transition-transform duration-500 group-hover:scale-125"></div>
+<span class="material-symbols-outlined text-primary-container bg-tertiary-fixed p-4 rounded-2xl text-4xl mb-8 inline-block relative z-10 shadow-sm">headphones</span>
+<h3 class="font-headline-md text-primary-container mb-4 relative z-10 font-extrabold text-2xl md:text-3xl tracking-tight leading-tight">Audio Quick<br>Recaps</h3>
+<p class="font-body-md text-on-surface-variant relative z-10 mt-6 pt-6 border-t border-outline-variant/20">Listen to professional voice actors narrate summaries while you commute or workout.</p>
+</div>
+<!-- Card 3 -->
+<div class="carousel-card min-w-[300px] md:min-w-[360px] max-w-[360px] bg-surface-container-lowest p-10 rounded-[32px] border-2 border-outline-variant/20 flex-shrink-0 cursor-pointer relative overflow-hidden group">
+<div class="absolute top-0 right-0 w-40 h-40 bg-primary-fixed/30 rounded-bl-full -mr-20 -mt-20 transition-transform duration-500 group-hover:scale-125"></div>
+<span class="material-symbols-outlined text-primary-container bg-primary-fixed p-4 rounded-2xl text-4xl mb-8 inline-block relative z-10 shadow-sm">lightbulb</span>
+<h3 class="font-headline-md text-primary-container mb-4 relative z-10 font-extrabold text-2xl md:text-3xl tracking-tight leading-tight">Ask AI<br>Feature</h3>
+<p class="font-body-md text-on-surface-variant relative z-10 mt-6 pt-6 border-t border-outline-variant/20">Ask questions about any book and get immediate, context-aware answers.</p>
+</div>
+<!-- Card 4 -->
+<div class="carousel-card min-w-[300px] md:min-w-[360px] max-w-[360px] bg-surface-container-lowest p-10 rounded-[32px] border-2 border-outline-variant/20 flex-shrink-0 cursor-pointer relative overflow-hidden group">
+<div class="absolute top-0 right-0 w-40 h-40 bg-error-container/40 rounded-bl-full -mr-20 -mt-20 transition-transform duration-500 group-hover:scale-125"></div>
+<span class="material-symbols-outlined text-primary-container bg-error-container p-4 rounded-2xl text-4xl mb-8 inline-block relative z-10 shadow-sm">star</span>
+<h3 class="font-headline-md text-primary-container mb-4 relative z-10 font-extrabold text-2xl md:text-3xl tracking-tight leading-tight">Smart<br>Recommendations</h3>
+<p class="font-body-md text-on-surface-variant relative z-10 mt-6 pt-6 border-t border-outline-variant/20">Personalized suggestions tailored to your reading habits and goals.</p>
+</div>
+<!-- Card 5 -->
+<div class="carousel-card min-w-[300px] md:min-w-[360px] max-w-[360px] bg-surface-container-lowest p-10 rounded-[32px] border-2 border-outline-variant/20 flex-shrink-0 cursor-pointer relative overflow-hidden group">
+<div class="absolute top-0 right-0 w-40 h-40 bg-tertiary-container/30 rounded-bl-full -mr-20 -mt-20 transition-transform duration-500 group-hover:scale-125"></div>
+<span class="material-symbols-outlined text-primary-container bg-tertiary-container p-4 rounded-2xl text-4xl mb-8 inline-block relative z-10 shadow-sm">menu_book</span>
+<h3 class="font-headline-md text-primary-container mb-4 relative z-10 font-extrabold text-2xl md:text-3xl tracking-tight leading-tight">Growing<br>Library</h3>
+<p class="font-body-md text-on-surface-variant relative z-10 mt-6 pt-6 border-t border-outline-variant/20">Explore thousands of titles across 20+ categories, with new books added daily.</p>
+</div>
+</div>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const carouselTrack = document.getElementById('carouselTrack');
+        const carouselWrapper = document.getElementById('carouselWrapper');
+        const cards = document.querySelectorAll('.carousel-card');
+        
+        const updateCenterCard = () => {
+            const wrapperRect = carouselWrapper.getBoundingClientRect();
+            const viewCenter = wrapperRect.left + wrapperRect.width / 2;
+            
+            let closestCard = null;
+            let closestDistance = Infinity;
+            
+            cards.forEach(card => {
+                const cardRect = card.getBoundingClientRect();
+                const cardCenter = cardRect.left + cardRect.width / 2;
+                const distance = Math.abs(viewCenter - cardCenter);
+                
+                if (distance < closestDistance) {
+                    closestDistance = distance;
+                    closestCard = card;
+                }
+            });
+            
+            cards.forEach(card => card.classList.remove('center-focus'));
+            if (closestCard) {
+                closestCard.classList.add('center-focus');
+            }
+        };
+
+        // Call update center card frequently to keep the effect smooth during animation
+        setInterval(updateCenterCard, 50);
+    });
+</script>
+</section>
+<!-- How It Works -->
+<section class="py-24 bg-surface text-on-surface visible" id="how-it-works"><div class="max-w-7xl mx-auto px-28 relative">
+<div class="text-center mb-20 fade-up visible">
+<h2 class="font-display-lg text-4xl md:text-5xl mb-4 text-primary tracking-tight">How BookSnap Works</h2>
+<p class="font-body-lg text-on-surface-variant max-w-2xl mx-auto">Your journey from curiosity to mastery in five dynamic steps.</p>
+</div>
+<div class="flex flex-col items-center gap-8 max-w-5xl mx-auto">
+<!-- Top Row: Steps 1, 2, 3 -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8 w-full items-stretch">
+<!-- Step 01 -->
+<div class="p-8 rounded-[32px] border border-outline-variant/20 flex flex-col fade-up stagger-1 visible bg-secondary-container/30 relative text-center transition-all duration-500 hover:shadow-2xl hover:z-20 mockup-interactive group">
+<div class="absolute inset-0 opacity-20 pointer-events-none overflow-hidden"><img class="absolute -top-10 -left-10 w-40 h-40 rotate-12 object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAyA7GFK8YdRGOa63a-o_rxeyOliySDPPjnnET5rt-BV45cddu0bNdletlxXlzYwXcSiob6IR5dYtXci48upuXlibQiMcrGhYdZNBYoPWVLOOOiGIXNvmAxN3ecJGNUkEEsCFxBKcDv8m9xI8U7k7fVhT8vGElFvGzld6f2ikuPwGRaKEpXgpkulEU1slY50sX6LC0h_HWLidHvoGiXnaCq7eo97nY6kNwWi0xZcDr_2pyUN6L2gOspecxNItPslCCfgWRil2xuC9sH"></div>
+<div class="flex items-start mb-8 relative z-10 justify-center gap-4"><div class="w-12 h-12 bg-tertiary-container text-primary-container rounded-full flex items-center justify-center font-bold shadow-sm">01</div></div>
+<h3 class="font-headline-md text-2xl mb-4 text-primary font-bold relative z-10">Discover BookSnap</h3>
+<p class="font-body-md text-on-surface-variant mb-6 relative z-10">Learn how BookSnap helps users read smarter through bite-sized summaries.</p>
+<div class="mt-auto pt-4 relative z-10" style="perspective: 1000px;"><div class="mx-auto w-[180px] aspect-[9/19] bg-inverse-surface rounded-[32px] border-[6px] border-inverse-surface shadow-xl overflow-hidden relative transition-transform duration-500 group-hover:scale-110"><img alt="BookSnap StoryFlow Interface" class="object-cover w-full h-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD9vnwZZV74WnQ0NBpEMuM9SXzvfKAahKECivecMWH8kQWK7jqxexbX1Ss5oLDHzFjyzIYQ7qTPLRptWTtOZJq9Ir4OqZggKQyk2QAqM23dISaQyVFiVG9nQVvwHbUQAHd1X7M08upVRGGezM0vu0ZU0Y-RZk-Tsvjq03zqnIGrdqEqn7U-O-TwBI7axRKPEN1Jdi1qSmtwsiohDHbRvYPJnCZJ2doPd2C6UyZh_n6Uj3vsSFdwehLnuIpVx-NXalA47k3w4k9OvP_UJZ8">
+<div class="absolute top-0 left-1/2 -translate-x-1/2 w-16 h-4 bg-inverse-surface rounded-b-xl z-10"></div></div></div>
+</div>
+<!-- Step 02 -->
+<div class="p-8 rounded-[32px] border border-outline-variant/20 flex flex-col fade-up stagger-2 visible bg-primary-fixed/30 relative text-center transition-all duration-500 hover:shadow-2xl hover:z-20 mockup-interactive group">
+<div class="absolute inset-0 opacity-20 pointer-events-none overflow-hidden"><img class="absolute -bottom-10 -right-10 w-48 h-48 -rotate-12 object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBIgCMafFp7wNJLUUHwH62Kc6eOeccSu1Ec1tQnu2cJBcgBPNnuf0ohg2bVZIP7ga4E1PQko1oRECOqXL6dD5bhlJBQjfCPv44lSu1EiRIR-XLz2-hLb4ITyLwsIqgjC7slBhIUkakzf2NVv6JFHfPUAkyc2K-qjNFU9SVh152w3xSkk7ss5uo6GG_fPsBhn8emZyCqXfTMDhb0pDkPhJznwEP9j9N0spMbnKMd3-2dMgrRcWColqjD5vtntcYD9Rvh1U7ma4bfIc2q"></div>
+<div class="flex items-start mb-8 relative z-10 justify-center gap-4"><div class="w-12 h-12 bg-primary-container text-surface-container-lowest rounded-full flex items-center justify-center font-bold shadow-sm">02</div></div>
+<h3 class="font-headline-md text-2xl mb-4 text-primary font-bold relative z-10">Sign Up &amp; Personalize</h3>
+<p class="font-body-md text-on-surface-variant mb-6 relative z-10">Create an account, choose favorite genres, and set reading goals.</p>
+<div class="mt-auto pt-4 relative z-10" style="perspective: 1000px;"><div class="mx-auto w-[180px] aspect-[9/19] bg-inverse-surface rounded-[32px] border-[6px] border-inverse-surface shadow-xl overflow-hidden relative transition-transform duration-500 group-hover:scale-110"><img alt="BookSnap StoryFlow Interface" class="object-cover w-full h-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBRAqvzpb5Yefh3lBz1o2hHCmvOEFasIRTZeAFX0cmJypDT9iFFfGlNIjmLRFpCquVsAYr20tFX5FJjSLXFAEq8JWjaiGv1MpLKMSHcBPxrwY2r5MMW9WltVRw6IDciJJYkz1wE7t-efwz2DndHtDXpYHmAnRohJx8HLLJ7rIcdQs3cplC8R5lhqE21UTNVxwsKRCri_L76T3hDI3n3r44a11t3OzrKpQ0THvIEwWyIWWmlcYde2-0vchYbygs29p9GghAThwnt-Fsq6VA">
+<div class="absolute top-0 left-1/2 -translate-x-1/2 w-16 h-4 bg-inverse-surface rounded-b-xl z-10"></div></div></div>
+</div>
+<!-- Step 03 -->
+<div class="p-8 rounded-[32px] border border-outline-variant/20 flex flex-col fade-up stagger-3 visible bg-tertiary-fixed/30 relative text-center transition-all duration-500 hover:shadow-2xl hover:z-20 mockup-interactive group">
+<div class="absolute inset-0 opacity-20 pointer-events-none overflow-hidden"><img class="absolute top-1/2 -right-10 w-32 h-32 rotate-45 object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAyA7GFK8YdRGOa63a-o_rxeyOliySDPPjnnET5rt-BV45cddu0bNdletlxXlzYwXcSiob6IR5dYtXci48upuXlibQiMcrGhYdZNBYoPWVLOOOiGIXNvmAxN3ecJGNUkEEsCFxBKcDv8m9xI8U7k7fVhT8vGElFvGzld6f2ikuPwGRaKEpXgpkulEU1slY50sX6LC0h_HWLidHvoGiXnaCq7eo97nY6kNwWi0xZcDr_2pyUN6L2gOspecxNItPslCCfgWRil2xuC9sH"></div>
+<div class="flex items-start mb-8 relative z-10 justify-center gap-4"><div class="w-12 h-12 bg-tertiary-container text-primary-container rounded-full flex items-center justify-center font-bold shadow-sm">03</div></div>
+<h3 class="font-headline-md text-2xl mb-4 text-primary font-bold relative z-10">Read or Listen</h3>
+<p class="font-body-md text-on-surface-variant mb-6 relative z-10">Explore StoryFlow summaries or enjoy quick audio recaps.</p>
+<div class="mt-auto pt-4 relative z-10" style="perspective: 1000px;"><div class="mx-auto w-[180px] aspect-[9/19] bg-inverse-surface rounded-[32px] border-[6px] border-inverse-surface shadow-xl overflow-hidden relative transition-transform duration-500 group-hover:scale-110"><img alt="BookSnap StoryFlow Interface" class="object-cover w-full h-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB_nyRpEBoTpdRxpVNPL9FYbbQlHIEbsufhdBgB_JmLskNwCtjpcQhEgt_1uFvNJPtXtUe-XojOtLGARk13eVTAA99QUsKS6UNLjSjHnRCkxXO3hhYsL9IJY1aQPEsqbLn7oW2R1178e6xCYdAjjnxz9l2z1sKSvOQrgFoDN0okLwnetwTAA88eJa4s66ch8l40blhbEaKJs9hBZhXdfTW9l0Ss6gl2fF1-T87Zz54SBcW-UacbqdNGLmtM9ZbXtzVN5BCMtH9JcJ5i26Y">
+<div class="absolute top-0 left-1/2 -translate-x-1/2 w-16 h-4 bg-inverse-surface rounded-b-xl z-10"></div></div></div>
+</div>
+</div>
+<!-- Bottom Row: Steps 4, 5 (Centered) -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8 w-full md:max-w-[66%] items-stretch">
+<!-- Step 04 -->
+<div class="p-8 rounded-[32px] border border-outline-variant/20 flex flex-col fade-up stagger-4 visible bg-surface-container relative text-center transition-all duration-500 hover:shadow-2xl hover:z-20 mockup-interactive group">
+<div class="absolute inset-0 opacity-20 pointer-events-none overflow-hidden"><img class="absolute -top-10 right-0 w-40 h-40 rotate-45 object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBIgCMafFp7wNJLUUHwH62Kc6eOeccSu1Ec1tQnu2cJBcgBPNnuf0ohg2bVZIP7ga4E1PQko1oRECOqXL6dD5bhlJBQjfCPv44lSu1EiRIR-XLz2-hLb4ITyLwsIqgjC7slBhIUkakzf2NVv6JFHfPUAkyc2K-qjNFU9SVh152w3xSkk7ss5uo6GG_fPsBhn8emZyCqXfTMDhb0pDkPhJznwEP9j9N0spMbnKMd3-2dMgrRcWColqjD5vtntcYD9Rvh1U7ma4bfIc2q"><img class="absolute bottom-0 left-0 w-24 h-24 -rotate-12 object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAyA7GFK8YdRGOa63a-o_rxeyOliySDPPjnnET5rt-BV45cddu0bNdletlxXlzYwXcSiob6IR5dYtXci48upuXlibQiMcrGhYdZNBYoPWVLOOOiGIXNvmAxN3ecJGNUkEEsCFxBKcDv8m9xI8U7k7fVhT8vGElFvGzld6f2ikuPwGRaKEpXgpkulEU1slY50sX6LC0h_HWLidHvoGiXnaCq7eo97nY6kNwWi0xZcDr_2pyUN6L2gOspecxNItPslCCfgWRil2xuC9sH"></div>
+<div class="flex items-start mb-8 relative z-10 justify-center gap-4"><div class="w-12 h-12 bg-primary-container text-surface-container-lowest rounded-full flex items-center justify-center font-bold shadow-sm">04</div></div>
+<h3 class="font-headline-md text-2xl mb-4 text-primary font-bold relative z-10">Ask AI</h3>
+<p class="font-body-md text-on-surface-variant mb-6 relative z-10">Use Ask AI to explore themes, ideas, characters, and lessons from the book.</p>
+<div class="mt-auto pt-4 relative z-10" style="perspective: 1000px;"><div class="mx-auto w-[180px] aspect-[9/19] bg-inverse-surface rounded-[32px] border-[6px] border-inverse-surface shadow-xl overflow-hidden relative transition-transform duration-500 group-hover:scale-110"><img alt="BookSnap StoryFlow Interface" class="object-cover w-full h-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCQOBn92EYLa_pe2bbLHSOeKFt9TrFHZlub8fMDEDhepdrOvmlqABsA-grE7IzInFYITw91MnRoe48AkOR7I4FuNYUJIx3r2wbR398q7SZT2zt6B72XqDDkEyqwUTXL1MpZggLU5QThfi77nO8ViVjhG3Q05PBogbDhZLKaHb1Rw73q3_s-uqyJBrAlzHXQqOSMXYB40bTTCtQ9OH7UVDoaUlqTIQLdFuMdr-VrngSGOh4-q5tFt1rXEd58xXqMb4DsA67Bt-S1CwM-f18">
+<div class="absolute top-0 left-1/2 -translate-x-1/2 w-16 h-4 bg-inverse-surface rounded-b-xl z-10"></div></div></div>
+</div>
+<!-- Step 05 -->
+<div class="p-8 rounded-[32px] border border-outline-variant/20 flex flex-col fade-up stagger-1 visible bg-error-container/40 relative text-center transition-all duration-500 hover:shadow-2xl hover:z-20 mockup-interactive group">
+<div class="absolute inset-0 opacity-20 pointer-events-none overflow-hidden"><img class="absolute top-1/4 left-1/4 w-64 h-64 opacity-30 object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAyA7GFK8YdRGOa63a-o_rxeyOliySDPPjnnET5rt-BV45cddu0bNdletlxXlzYwXcSiob6IR5dYtXci48upuXlibQiMcrGhYdZNBYoPWVLOOOiGIXNvmAxN3ecJGNUkEEsCFxBKcDv8m9xI8U7k7fVhT8vGElFvGzld6f2ikuPwGRaKEpXgpkulEU1slY50sX6LC0h_HWLidHvoGiXnaCq7eo97nY6kNwWi0xZcDr_2pyUN6L2gOspecxNItPslCCfgWRil2xuC9sH"></div>
+<div class="flex items-start mb-8 relative z-10 justify-center gap-4"><div class="w-12 h-12 bg-error text-on-error rounded-full flex items-center justify-center font-bold shadow-sm">05</div></div>
+<h3 class="font-headline-md text-2xl mb-4 text-primary font-bold relative z-10">Watch &amp; Explore More</h3>
+<p class="font-body-md text-on-surface-variant mb-6 relative z-10">Show that BookSnap also supports richer visual learning through short video mode.</p>
+<div class="mt-auto pt-4 relative z-10" style="perspective: 1000px;"><div class="mx-auto w-[180px] aspect-[9/19] bg-inverse-surface rounded-[32px] border-[6px] border-inverse-surface shadow-xl overflow-hidden relative transition-transform duration-500 group-hover:scale-110"><img alt="BookSnap StoryFlow Interface" class="object-cover w-full h-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAPB601LWiRnpT7Ct37lahSr7zclN6Vi_vmEgdhMLsI-g3Vf6g7s_AcdOrzOq4WMkD7Cto1M1ttEkUDt48c66b987aqBvo5wsUjftZb_lsJgLiihd_nu-PiRxKJKwoAFju0yWQjLyKJlYTXl7eMRvdEklKDEIAEAEsXYALxtIUgho14rQkMU9f4NEHll0VO4hgzh20KKWCFny9ryM-vKeZgQ_bLnAC9tSycdtCefAsK-gB7vnMtk_i65kZ5hmog0hqWV-v_OQKlqKvyMk4">
+<div class="absolute top-0 left-1/2 -translate-x-1/2 w-16 h-4 bg-inverse-surface rounded-b-xl z-10"></div></div></div>
+</div>
+</div>
+</div>
+</div></section><section class="bg-primary-container rounded-[48px] mx-[64px] my-24 p-16 relative overflow-hidden shadow-2xl" id="pricing">
+<div class="max-w-7xl mx-auto relative z-10">
+<div class="text-center mb-16">
+<h2 class="font-display-lg text-4xl md:text-5xl text-surface-container-lowest mb-4">Simple, Transparent Pricing</h2>
+<p class="font-body-lg text-surface-container-lowest opacity-90">Choose the plan that fits your learning pace.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6 items-stretch">
+<div class="bg-surface-container-lowest rounded-[32px] p-8 shadow-lg transition-all duration-500 cursor-pointer group hover:scale-105 btn-hover-lift flex flex-col relative overflow-hidden" onclick="this.parentElement.querySelectorAll('div').forEach(d =&gt; d.classList.remove('bg-secondary-container/30', 'shadow-2xl')); this.classList.add('bg-secondary-container/30', 'shadow-2xl')">
+<div class="absolute -top-4 -right-4 w-20 h-20 bg-primary/5 rounded-full"></div>
+<h3 class="font-headline-md text-xl text-primary mb-2">Free</h3>
+<div class="flex items-baseline gap-1 mb-4">
+<span class="text-4xl font-bold text-primary">$0</span>
+</div>
+<p class="font-body-md text-on-surface-variant text-sm mb-6">Perfect for getting started with BookSnap.</p>
+<ul class="space-y-3 mb-8 flex-grow">
+<li class="flex items-center gap-2 text-sm text-on-surface-variant"><span class="material-symbols-outlined text-primary text-lg">check_circle</span> 3-day free trial</li>
+<li class="flex items-center gap-2 text-sm text-on-surface-variant"><span class="material-symbols-outlined text-primary text-lg">check_circle</span> Unlimited access</li>
+</ul>
+<button class="w-full py-3 rounded-full bg-primary text-surface-container-lowest font-label-md transition-colors hover:bg-primary/90">Subscribe Now</button>
+</div>
+<div class="bg-surface-container-lowest rounded-[32px] p-8 shadow-lg transition-all duration-500 cursor-pointer group hover:scale-105 btn-hover-lift flex flex-col relative overflow-hidden" onclick="this.parentElement.querySelectorAll('div').forEach(d =&gt; d.classList.remove('bg-secondary-container/30', 'shadow-2xl')); this.classList.add('bg-secondary-container/30', 'shadow-2xl')">
+<div class="absolute -bottom-4 -left-4 w-16 h-16 bg-secondary-container/20 rounded-full"></div>
+<h3 class="font-headline-md text-xl text-primary mb-2">Daily</h3>
+<div class="flex items-baseline gap-1 mb-4">
+<span class="text-4xl font-bold text-primary">$0.50</span>
+<span class="text-on-surface-variant text-sm">/day</span>
+</div>
+<p class="font-body-md text-on-surface-variant text-sm mb-6">Flexibility for occasional readers.</p>
+<ul class="space-y-3 mb-8 flex-grow">
+<li class="flex items-center gap-2 text-sm text-on-surface-variant"><span class="material-symbols-outlined text-primary text-lg">check_circle</span> Unlimited access</li>
+<li class="flex items-center gap-2 text-sm text-on-surface-variant"><span class="material-symbols-outlined text-primary text-lg">check_circle</span> Daily billing</li>
+</ul>
+<button class="w-full py-3 rounded-full bg-primary text-surface-container-lowest font-label-md transition-colors hover:bg-primary/90">Subscribe Now</button>
+</div>
+<div class="bg-surface-container-lowest rounded-[32px] p-8 shadow-2xl transition-all duration-500 cursor-pointer group hover:scale-105 btn-hover-lift flex flex-col relative overflow-hidden border-2 border-tertiary-fixed" onclick="this.parentElement.querySelectorAll('div').forEach(d =&gt; d.classList.remove('bg-secondary-container/30', 'shadow-2xl')); this.classList.add('bg-secondary-container/30', 'shadow-2xl')">
+<div class="absolute top-4 right-4 bg-tertiary-fixed text-primary-container text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">Most Popular</div>
+<h3 class="font-headline-md text-xl text-primary mb-2">Weekly</h3>
+<div class="flex items-baseline gap-1 mb-4">
+<span class="text-4xl font-bold text-primary">$1.50</span>
+<span class="text-on-surface-variant text-sm">/week</span>
+</div>
+<p class="font-body-md text-on-surface-variant text-sm mb-6">Our most loved plan for consistent growth.</p>
+<ul class="space-y-3 mb-8 flex-grow">
+<li class="flex items-center gap-2 text-sm text-on-surface-variant"><span class="material-symbols-outlined text-primary text-lg">check_circle</span> Unlimited access</li>
+<li class="flex items-center gap-2 text-sm text-on-surface-variant"><span class="material-symbols-outlined text-primary text-lg">check_circle</span> Weekly billing</li>
+<li class="flex items-center gap-2 text-sm text-on-surface-variant"><span class="material-symbols-outlined text-primary text-lg">check_circle</span> Priority support</li>
+</ul>
+<button class="w-full py-3 rounded-full bg-primary text-surface-container-lowest font-label-md transition-colors hover:bg-primary/90">Subscribe Now</button>
+</div>
+<div class="bg-surface-container-lowest rounded-[32px] p-8 shadow-lg transition-all duration-500 cursor-pointer group hover:scale-105 btn-hover-lift flex flex-col relative overflow-hidden" onclick="this.parentElement.querySelectorAll('div').forEach(d =&gt; d.classList.remove('bg-secondary-container/30', 'shadow-2xl')); this.classList.add('bg-secondary-container/30', 'shadow-2xl')">
+<div class="absolute -top-6 -left-6 w-24 h-24 bg-primary-fixed/10 rounded-full"></div>
+<h3 class="font-headline-md text-xl text-primary mb-2">Monthly</h3>
+<div class="flex items-baseline gap-1 mb-4">
+<span class="text-4xl font-bold text-primary">$5</span>
+<span class="text-on-surface-variant text-sm">/month</span>
+</div>
+<p class="font-body-md text-on-surface-variant text-sm mb-6">Best value for dedicated lifelong learners.</p>
+<ul class="space-y-3 mb-8 flex-grow">
+<li class="flex items-center gap-2 text-sm text-on-surface-variant"><span class="material-symbols-outlined text-primary text-lg">check_circle</span> Best value</li>
+<li class="flex items-center gap-2 text-sm text-on-surface-variant"><span class="material-symbols-outlined text-primary text-lg">check_circle</span> Monthly billing</li>
+<li class="flex items-center gap-2 text-sm text-on-surface-variant"><span class="material-symbols-outlined text-primary text-lg">check_circle</span> All premium features</li>
+</ul>
+<button class="w-full py-3 rounded-full bg-primary text-surface-container-lowest font-label-md transition-colors hover:bg-primary/90">Subscribe Now</button>
+</div>
+</div>
+</div>
+<div class="absolute top-0 left-0 w-full h-full pointer-events-none">
+<div class="absolute top-10 left-10 w-64 h-64 bg-white/5 rounded-full blur-3xl opacity-40"></div>
+<div class="absolute top-1/4 right-1/4 w-48 h-48 bg-white/5 rounded-full blur-2xl opacity-30"></div>
+<div class="absolute bottom-1/4 left-1/3 w-56 h-56 bg-white/5 rounded-full blur-3xl opacity-30"></div>
+<div class="absolute bottom-10 right-10 w-96 h-96 bg-white/5 rounded-full blur-3xl opacity-40"></div>
+</div>
+</section><section class="py-24 px-[64px] bg-surface overflow-hidden" id="testimonials">
+<div class="max-w-7xl mx-auto">
+<div class="text-center mb-16 fade-up visible">
+<h2 class="font-display-lg text-4xl md:text-5xl text-primary mb-4">User Testimonials</h2>
+<p class="font-body-lg text-on-surface-variant">Join thousands of lifelong learners mastering new topics daily.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8 relative z-10">
+<!-- Row 1 -->
+<div class="glass-card p-8 rounded-[32px] bg-secondary-container/20 border-none shadow-lg btn-hover-lift transform -rotate-2 hover:rotate-0 transition-all duration-500">
+<div class="flex items-center gap-4 mb-4">
+<div class="w-12 h-12 rounded-full bg-secondary-container flex items-center justify-center text-primary font-bold">SJ</div>
+<div>
+<h4 class="font-label-md text-primary">Sarah Jenkins</h4>
+<p class="text-label-sm text-on-surface-variant">Product Manager</p>
+</div>
+</div>
+<p class="font-body-md text-on-surface-variant italic">"BookSnap has completely changed how I consume information. I read 3 books a week now during my commute."</p>
+</div>
+<div class="glass-card p-8 rounded-[32px] bg-tertiary-fixed/20 border-none shadow-lg btn-hover-lift transform rotate-3 hover:rotate-0 transition-all duration-500 md:mt-12">
+<div class="flex items-center gap-4 mb-4">
+<div class="w-12 h-12 rounded-full bg-tertiary-fixed flex items-center justify-center text-primary font-bold">DC</div>
+<div>
+<h4 class="font-label-md text-primary">David Chen</h4>
+<p class="text-label-sm text-on-surface-variant">Entrepreneur</p>
+</div>
+</div>
+<p class="font-body-md text-on-surface-variant italic">"The audio quality is phenomenal. It doesn't sound like a robot reading text. Highly recommend for busy professionals."</p>
+</div>
+<div class="glass-card p-8 rounded-[32px] bg-primary-fixed/20 border-none shadow-lg btn-hover-lift transform -rotate-1 hover:rotate-0 transition-all duration-500">
+<div class="flex items-center gap-4 mb-4">
+<div class="w-12 h-12 rounded-full bg-primary-fixed flex items-center justify-center text-primary font-bold">ER</div>
+<div>
+<h4 class="font-label-md text-primary">Elena Rodriguez</h4>
+<p class="text-label-sm text-on-surface-variant">Marketing Director</p>
+</div>
+</div>
+<p class="font-body-md text-on-surface-variant italic">"The Ask AI feature is a game-changer. Whenever I need to recall a specific framework from a book, I just ask."</p>
+</div>
+<!-- Row 2 -->
+<div class="glass-card p-8 rounded-[32px] bg-surface-container-low border-none shadow-lg btn-hover-lift transform rotate-2 hover:rotate-0 transition-all duration-500">
+<div class="flex items-center gap-4 mb-4">
+<div class="w-12 h-12 rounded-full bg-primary-container/20 flex items-center justify-center text-primary font-bold">MT</div>
+<div>
+<h4 class="font-label-md text-primary">Marcus Thorne</h4>
+<p class="text-label-sm text-on-surface-variant">Tech Lead</p>
+</div>
+</div>
+<p class="font-body-md text-on-surface-variant italic">"The StoryFlow summaries are a masterpiece of information density. I can stay updated on my industry in minutes."</p>
+</div>
+<div class="glass-card p-8 rounded-[32px] bg-secondary-container/10 border-none shadow-lg btn-hover-lift transform -rotate-3 hover:rotate-0 transition-all duration-500 md:-mt-8">
+<div class="flex items-center gap-4 mb-4">
+<div class="w-12 h-12 rounded-full bg-secondary-container/30 flex items-center justify-center text-primary font-bold">SA</div>
+<div>
+<h4 class="font-label-md text-primary">Sophia Al-Kindi</h4>
+<p class="text-label-sm text-on-surface-variant">Graduate Student</p>
+</div>
+</div>
+<p class="font-body-md text-on-surface-variant italic">"It's like having a personal tutor for every non-fiction book I own. The AI insights are incredibly sharp."</p>
+</div>
+<div class="glass-card p-8 rounded-[32px] bg-tertiary-container/10 border-none shadow-lg btn-hover-lift transform rotate-1 hover:rotate-0 transition-all duration-500 md:mt-4">
+<div class="flex items-center gap-4 mb-4">
+<div class="w-12 h-12 rounded-full bg-tertiary-container/30 flex items-center justify-center text-primary font-bold">JL</div>
+<div>
+<h4 class="font-label-md text-primary">Jordan Lee</h4>
+<p class="text-label-sm text-on-surface-variant">Creative Director</p>
+</div>
+</div>
+<p class="font-body-md text-on-surface-variant italic">"The UI is a breath of fresh air. It's rare to find an app that is both this powerful and this beautiful."</p>
+</div>
+<!-- Decorative Background Elements -->
+<div class="absolute -top-20 -left-20 w-64 h-64 bg-secondary-container/10 rounded-full blur-3xl -z-10 animate-float-1"></div>
+<div class="absolute -bottom-20 -right-20 w-80 h-80 bg-tertiary-fixed/10 rounded-full blur-3xl -z-10 animate-float-2"></div>
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-primary-fixed/5 rounded-full blur-[100px] -z-10"></div>
+</div>
+</div>
+</section>
+<!-- App Preview -->
+<!-- Categories -->
+<section class="py-24 px-[64px] bg-surface-container-lowest relative overflow-hidden" id="faq"><div class="absolute inset-0 pointer-events-none opacity-10"><img alt="" class="absolute -top-20 -left-20 w-96 h-auto rotate-12" src="https://lh3.googleusercontent.com/aida-public/AB6AXuANNczUrZuxlOWIEDdcE0opqRnvOqqjI7SBVrPe5LmBNy8jthTlbIhu1SW5qB1RBL1vRnIdiwRJUSlJ0sNlLuHL23jz-stdJRiBdrdmzDWctahOVcEDwq7jQOVvHxDJp3rzVwFVdMQqxNZj9w7VBkHRyIm61LNENwxzU5xjORsIA3O5wkUdWqzzhT2P9SB88oAKjjcIYPA99GOn_p4XJdMRFQ_g9H243AqRS8C1YzvmEtm4Ntv6NI_7uU3-gqdfjm8GwM81p_01FvQP"><img alt="" class="absolute -bottom-20 -right-20 w-96 h-auto -rotate-12" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCBHvxQrOBYa6k_TRXNRbz4PeRT4mAeWcuYW0-5hdmssaYL2V9JHgyVhNLypd0MSb_CnGU4hmRUPQH0NlHN0nfQSEH2C2RtW9QqD9a4jwEkCfbGa4ohYluKdoPYvdD5wa-14XKaQZ5t21wSP-5RIwup4-7ZBt9CEbLTFVLuXInMl8RpalXRUNm1_ismeVoGtjJnJz_SeWYvOuZ3YuPONp3MBHE0OnwwIiWsBDW-fyCBWEWZJ9hlIIj-a_CDsho5T_CQeCk2vs4fFDrr"></div><div class="max-w-7xl mx-auto relative z-10"><div class="text-center mb-16 fade-up visible"><h2 class="font-display-lg text-4xl md:text-5xl text-primary mb-4">Frequently Asked Questions</h2><p class="font-body-lg text-on-surface-variant">Everything you need to know about BookSnap.</p></div><div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start"><div class="space-y-6"><div class="faq-card group bg-secondary-container/20 p-6 rounded-[28px] cursor-pointer btn-hover-lift transition-all duration-500 transform hover:-rotate-1" onclick="this.querySelector('.faq-answer').classList.toggle('hidden'); this.querySelector('.faq-icon').textContent = this.querySelector('.faq-answer').classList.contains('hidden') ? 'add' : 'remove'"><div class="flex justify-between items-center gap-4"><h4 class="font-headline-md text-xl text-primary">What is BookSnap?</h4><span class="material-symbols-outlined faq-icon text-primary">add</span></div><p class="faq-answer hidden mt-4 font-body-md text-on-surface-variant border-t border-primary/10 pt-4">BookSnap is a mobile-first app providing bite-sized book summaries, audio recaps, and AI insights for faster learning.</p></div><div class="faq-card group bg-tertiary-fixed/20 p-6 rounded-[28px] cursor-pointer btn-hover-lift transition-all duration-500 transform hover:rotate-1 md:mt-12" onclick="this.querySelector('.faq-answer').classList.toggle('hidden'); this.querySelector('.faq-icon').textContent = this.querySelector('.faq-answer').classList.contains('hidden') ? 'add' : 'remove'"><div class="flex justify-between items-center gap-4"><h4 class="font-headline-md text-xl text-primary">How do I get started?</h4><span class="material-symbols-outlined faq-icon text-primary">add</span></div><p class="faq-answer hidden mt-4 font-body-md text-on-surface-variant border-t border-primary/10 pt-4">Create an account, select favorite genres, and start exploring summaries and audio recaps.</p></div><div class="faq-card group bg-secondary-container/20 p-6 rounded-[28px] cursor-pointer btn-hover-lift transition-all duration-500 transform hover:-rotate-1 md:mt-12" onclick="this.querySelector('.faq-answer').classList.toggle('hidden'); this.querySelector('.faq-icon').textContent = this.querySelector('.faq-answer').classList.contains('hidden') ? 'add' : 'remove'"><div class="flex justify-between items-center gap-4"><h4 class="font-headline-md text-xl text-primary">Is there a free trial?</h4><span class="material-symbols-outlined faq-icon text-primary">add</span></div><p class="faq-answer hidden mt-4 font-body-md text-on-surface-variant border-t border-primary/10 pt-4">3-day free trial with unlimited access; afterward choose Daily, Weekly, or Monthly subscription.</p></div><div class="faq-card group bg-tertiary-fixed/20 p-6 rounded-[28px] cursor-pointer btn-hover-lift transition-all duration-500 transform hover:rotate-1 md:mt-12" onclick="this.querySelector('.faq-answer').classList.toggle('hidden'); this.querySelector('.faq-icon').textContent = this.querySelector('.faq-answer').classList.contains('hidden') ? 'add' : 'remove'"><div class="flex justify-between items-center gap-4"><h4 class="font-headline-md text-xl text-primary">Which book categories are available?</h4><span class="material-symbols-outlined faq-icon text-primary">add</span></div><p class="faq-answer hidden mt-4 font-body-md text-on-surface-variant border-t border-primary/10 pt-4">Self-help, business, fiction, psychology, productivity, culture, and more.</p></div></div><div class="space-y-6 md:mt-8"><div class="faq-card group bg-tertiary-fixed/20 p-6 rounded-[28px] cursor-pointer btn-hover-lift transition-all duration-500 transform hover:rotate-1" onclick="this.querySelector('.faq-answer').classList.toggle('hidden'); this.querySelector('.faq-icon').textContent = this.querySelector('.faq-answer').classList.contains('hidden') ? 'add' : 'remove'"><div class="flex justify-between items-center gap-4"><h4 class="font-headline-md text-xl text-primary">What are the main features?</h4><span class="material-symbols-outlined faq-icon text-primary">add</span></div><p class="faq-answer hidden mt-4 font-body-md text-on-surface-variant border-t border-primary/10 pt-4">StoryFlow Summaries, Audio Quick Recaps, Ask AI, Smart Recommendations, Short Video Mode.</p></div><div class="faq-card group bg-secondary-container/20 p-6 rounded-[28px] cursor-pointer btn-hover-lift transition-all duration-500 transform hover:-rotate-1 md:mt-12" onclick="this.querySelector('.faq-answer').classList.toggle('hidden'); this.querySelector('.faq-icon').textContent = this.querySelector('.faq-answer').classList.contains('hidden') ? 'add' : 'remove'"><div class="flex justify-between items-center gap-4"><h4 class="font-headline-md text-xl text-primary">How does Ask AI work?</h4><span class="material-symbols-outlined faq-icon text-primary">add</span></div><p class="faq-answer hidden mt-4 font-body-md text-on-surface-variant border-t border-primary/10 pt-4">Ask questions about any book theme, idea, or character; AI responds as if “talking to the book”.</p></div><div class="faq-card group bg-tertiary-fixed/20 p-6 rounded-[28px] cursor-pointer btn-hover-lift transition-all duration-500 transform hover:rotate-1 md:mt-12" onclick="this.querySelector('.faq-answer').classList.toggle('hidden'); this.querySelector('.faq-icon').textContent = this.querySelector('.faq-answer').classList.contains('hidden') ? 'add' : 'remove'"><div class="flex justify-between items-center gap-4"><h4 class="font-headline-md text-xl text-primary">Are audio summaries available?</h4><span class="material-symbols-outlined faq-icon text-primary">add</span></div><p class="faq-answer hidden mt-4 font-body-md text-on-surface-variant border-t border-primary/10 pt-4">Yes, 3–5 minutes per summary for on-the-go learning.</p></div></div></div></div></section>
+<section class="relative py-24 px-[64px] overflow-hidden fade-up visible" id="final-cta">
+<div class="max-w-7xl mx-auto relative rounded-[48px] overflow-hidden shadow-2xl h-[500px] flex items-center justify-center">
+<!-- Background Image with Blur Edges -->
+<div class="absolute inset-0 z-0">
+<img alt="Lifestyle background" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBmJeJ4mqrGhUcFX3KVwxNX3h2APcoj1uoqcT1YCWARPPVIJufugRruZ5ATKCvq_S5qVZ-Lc9eIQcUzc7RZA3U3VH0_Wvv7JLVquskfGffgzBTojccvtZHkOssPrGbNVybx-yDYpU91O4VlRb_6YKwfonguZVSEknxWMm6pP6hGsFUa_GnycM1wZbkh5J_VlUn5ssnmNBvHLA_bM2qUdDWtzxtiWU-0n4chh5t4gZc3PEI0h4tdPNSqLHdyISSs0vkYmHSOXTEOhnUA">
+<div class="absolute inset-0 bg-primary/20 backdrop-blur-[2px]"></div>
+<div class="absolute inset-0 shadow-[inset_0_0_100px_rgba(0,0,0,0.2)]"></div>
+</div>
+<!-- Content Overlay -->
+<div class="relative z-10 text-center px-6 flex flex-col items-center justify-center h-full gap-8">
+<h2 class="font-display-lg text-4xl md:text-6xl text-white drop-shadow-lg font-bold" style="opacity: 0;">Set Your Reading Vibe</h2>
+<p class="font-body-lg text-white/90 max-w-xl mx-auto drop-shadow-md font-medium" style="opacity: 0;">Customize your experience to match the way you love discovering books</p>
+<a class="inline-block bg-primary opacity-90 hover:opacity-100 text-white font-headline-md text-xl px-12 py-5 rounded-full btn-hover-lift shadow-xl transition-all hover:scale-105" href="#">Get Started Free</a>
+</div>
+</div>
+</section>
+<footer class="bg-primary-container text-surface-container-lowest px-[64px] pt-16 pb-8 rounded-t-[48px] relative overflow-hidden">
+<div class="max-w-7xl mx-auto relative z-10">
+<!-- Animated Illustration -->
+<div class="flex justify-center mb-12">
+<div class="w-32 h-32">
+        <!-- STITCH_SVG_START:ANIMATION_75 class="" --><div id="animated-svg-ANIMATION_75" class="" style="display:block;width:100%;height:100%;min-height:200px;"><svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Open Book Illustration with Smiling Face -->
+  <g transform="translate(40, 60)">
+    <!-- Right Page -->
+    <path d="M60 0 C 80 0, 100 10, 100 20 L 100 80 C 100 90, 80 80, 60 80 Z" fill="#fcf8fb" stroke="#1a4d3a" stroke-width="2">
+      <animate attributeName="d" dur="4s" repeatCount="indefinite" values="M60 0 C 80 0, 100 10, 100 20 L 100 80 C 100 90, 80 80, 60 80 Z; M60 5 C 80 5, 95 15, 95 25 L 95 75 C 95 85, 80 75, 60 75 Z; M60 0 C 80 0, 100 10, 100 20 L 100 80 C 100 90, 80 80, 60 80 Z"></animate>
+    </path>
+    <!-- Left Page -->
+    <path d="M60 0 C 40 0, 20 10, 20 20 L 20 80 C 20 90, 40 80, 60 80 Z" fill="#fcf8fb" stroke="#1a4d3a" stroke-width="2">
+      <animate attributeName="d" dur="4s" repeatCount="indefinite" values="M60 0 C 40 0, 20 10, 20 20 L 20 80 C 20 90, 40 80, 60 80 Z; M60 5 C 40 5, 25 15, 25 25 L 25 75 C 25 85, 40 75, 60 75 Z; M60 0 C 40 0, 20 10, 20 20 L 20 80 C 20 90, 40 80, 60 80 Z"></animate>
+    </path>
+    <!-- Smiling Face -->
+    <g fill="#1a4d3a">
+      <circle cx="45" cy="50" r="2.5"></circle>
+      <circle cx="75" cy="50" r="2.5"></circle>
+      <path d="M55 60 Q 60 65, 65 60" fill="none" stroke="#1a4d3a" stroke-linecap="round" stroke-width="1.5"></path>
+    </g>
+    <!-- Sparkles -->
+    <g fill="#eab308">
+      <path d="M10 10 L 12 14 L 16 10 L 12 6 Z">
+        <animate attributeName="opacity" dur="2s" repeatCount="indefinite" values="0;1;0"></animate>
+      </path>
+      <path d="M110 30 L 112 34 L 116 30 L 112 26 Z">
+        <animate attributeName="opacity" dur="2.5s" repeatCount="indefinite" values="0;1;0"></animate>
+      </path>
+    </g>
+  </g>
+  <!-- Floating Background Shapes -->
+  <circle cx="30" cy="40" fill="#eab308" opacity="0.2" r="8">
+    <animate attributeName="cy" dur="5s" repeatCount="indefinite" values="40;30;40"></animate>
+  </circle>
+  <path d="M170 80 L 175 85 L 180 80 L 175 75 Z" fill="#eab308" opacity="0.3">
+    <animateTransform attributeName="transform" dur="6s" repeatCount="indefinite" type="rotate" values="0 175 80; 360 175 80"></animateTransform>
+  </path>
+</svg></div><!-- STITCH_SVG_END:ANIMATION_75 -->
+      </div>
+</div>
+<!-- Footer Grid -->
+<div class="grid grid-cols-1 md:grid-cols-5 gap-12 mb-16">
+<!-- Brand Column -->
+<div class="flex flex-col gap-6">
+<img alt="BookSnap Logo" class="h-8 w-auto object-contain brightness-0 invert" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBkeISwAl82X1Rirs10VojoJsJGIKaPoPyu_7ohwU2GtxLoL5fQkKq8SrQadgmURAhnPw1dIkuUYXWuyjUOUFKJHQCIZg74yhimGUuGXkKFQKtu-65mZPJ3fyPkzveYOFHtWzaIXUJNWtN2Ub852JLKISSALazX7qsa_tAd2GNI20oXayjmho0eiB_FpntsLUL8vsKt4bFkz7Vxla7syokk06XSv8__CG1kVjxxO0jlij9xURFo2AlSGiaGXFhB8_hZikbLusnhG_dI">
+<p class="font-body-md opacity-80">Read smarter, one snap at a time. The world's best ideas, bite-sized.</p>
+<div class="flex gap-4">
+<a class="btn-hover-lift opacity-80 hover:opacity-100" href="#"><span class="material-symbols-outlined">photo_camera</span></a>
+<a class="btn-hover-lift opacity-80 hover:opacity-100" href="#"><span class="material-symbols-outlined">alternate_email</span></a>
+<a class="btn-hover-lift opacity-80 hover:opacity-100" href="#"><span class="material-symbols-outlined">movie</span></a>
+</div>
+</div>
+<!-- Explore -->
+<div class="flex flex-col gap-4">
+<h4 class="font-label-md font-bold uppercase tracking-wider">Explore</h4>
+<ul class="flex flex-col gap-2">
+<li class=""><a class="font-label-md font-medium opacity-80 hover:opacity-100 btn-hover-lift inline-block" href="#">Browse Books</a></li>
+<li class=""><a class="font-label-md font-medium opacity-80 hover:opacity-100 btn-hover-lift inline-block" href="#">Categories</a></li>
+<li class=""><a class="font-label-md font-medium opacity-80 hover:opacity-100 btn-hover-lift inline-block" href="#">Top Picks</a></li>
+<li class=""><a class="font-label-md font-medium opacity-80 hover:opacity-100 btn-hover-lift inline-block" href="#">New Arrivals</a></li>
+<li class=""><a class="font-label-md font-medium opacity-80 hover:opacity-100 btn-hover-lift inline-block" href="#">Collections</a></li>
+</ul>
+</div>
+<!-- Features -->
+<div class="flex flex-col gap-4">
+<h4 class="font-label-md font-bold uppercase tracking-wider">Features</h4>
+<ul class="flex flex-col gap-2">
+<li class=""><a class="font-label-md font-medium opacity-80 hover:opacity-100 btn-hover-lift inline-block" href="#">Book Summaries</a></li>
+<li class=""><a class="font-label-md font-medium opacity-80 hover:opacity-100 btn-hover-lift inline-block" href="#">Watch Recaps</a></li>
+<li class=""><a class="font-label-md font-medium opacity-80 hover:opacity-100 btn-hover-lift inline-block" href="#">Reading Lists</a></li>
+<li class=""><a class="font-label-md font-medium opacity-80 hover:opacity-100 btn-hover-lift inline-block" href="#">Favorites</a></li>
+<li class=""><a class="font-label-md font-medium opacity-80 hover:opacity-100 btn-hover-lift inline-block" href="#">History</a></li>
+</ul>
+</div>
+<!-- Company -->
+<div class="flex flex-col gap-4">
+<h4 class="font-label-md font-bold uppercase tracking-wider">Company</h4>
+<ul class="flex flex-col gap-2">
+<li class=""><a class="font-label-md font-medium opacity-80 hover:opacity-100 btn-hover-lift inline-block" href="#">About Us</a></li>
+<li class=""><a class="font-label-md font-medium opacity-80 hover:opacity-100 btn-hover-lift inline-block" href="#">Blog</a></li>
+<li class=""><a class="font-label-md font-medium opacity-80 hover:opacity-100 btn-hover-lift inline-block" href="#">Careers</a></li>
+<li class=""><a class="font-label-md font-medium opacity-80 hover:opacity-100 btn-hover-lift inline-block" href="#">Partners</a></li>
+<li class=""><a class="font-label-md font-medium opacity-80 hover:opacity-100 btn-hover-lift inline-block" href="#">Press Kit</a></li>
+</ul>
+</div>
+<!-- Support -->
+<div class="flex flex-col gap-4">
+<h4 class="font-label-md font-bold uppercase tracking-wider">Support</h4>
+<ul class="flex flex-col gap-2">
+<li class=""><a class="font-label-md font-medium opacity-80 hover:opacity-100 btn-hover-lift inline-block" href="#">Help Center</a></li>
+<li class=""><a class="font-label-md font-medium opacity-80 hover:opacity-100 btn-hover-lift inline-block" href="#">Contact Us</a></li>
+<li class=""><a class="font-label-md font-medium opacity-80 hover:opacity-100 btn-hover-lift inline-block" href="#">Privacy Policy</a></li>
+<li class=""><a class="font-label-md font-medium opacity-80 hover:opacity-100 btn-hover-lift inline-block" href="#">Terms of Service</a></li>
+<li class=""><a class="font-label-md font-medium opacity-80 hover:opacity-100 btn-hover-lift inline-block" href="#">FAQ</a></li>
+</ul>
+</div>
+</div>
+<!-- Footer Base -->
+<div class="pt-8 border-t border-white/10 flex flex-col items-center gap-4">
+<div class="flex items-center gap-4 text-tertiary-fixed opacity-60">
+<span class="material-symbols-outlined">potted_plant</span>
+<span class="material-symbols-outlined">coffee</span>
+<span class="material-symbols-outlined">potted_plant</span>
+</div>
+<p class="font-label-sm opacity-60 text-center">© 2024 BookSnap. All rights reserved. Made for lifelong learners.</p>
+</div>
+</div>
+<!-- Decorative Background Glows -->
+<div class="absolute -bottom-20 -left-20 w-64 h-64 bg-white/5 rounded-full blur-3xl opacity-20"></div>
+<div class="absolute -top-20 -right-20 w-64 h-64 bg-white/5 rounded-full blur-3xl opacity-20"></div>
+</footer>
+
+</body></html>

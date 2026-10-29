@@ -1,0 +1,22 @@
+/* BookSnap LP: base + the few effects Tailwind utilities don't cover */
+html, body, #root { height: 100%; margin: 0; }
+body { background: #F7F2E8; color: #003625; font-family: "Plus Jakarta Sans", Inter, system-ui, sans-serif; -webkit-font-smoothing: antialiased; overflow: hidden; }
+
+.wave-bar { animation: wave 1.1s ease-in-out infinite; }
+@keyframes wave { 0%, 100% { transform: scaleY(0.3); } 50% { transform: scaleY(1); } }
+
+.cta-shine::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(105deg, transparent 35%, rgba(255, 255, 255, 0.22) 50%, transparent 65%);
+  transform: translateX(-120%);
+  animation: cta-shine 5s ease-in-out 2s infinite;
+}
+@keyframes cta-shine { 0%, 70% { transform: translateX(-120%); } 100% { transform: translateX(120%); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .wave-bar, .cta-shine::after { animation: none; }
+}
+
+/* Visible keyboard focus with 3:1+ contrast on both surfaces (WCAG 2.4.7 / 1.4.11) */
+:where(button, a, [tabindex]):focus-visible { outline: 3px solid #003625; outline-offset: 3px; }
+.bg-forest :where(button, a, [tabindex]):focus-visible { outline-color: #D5B66D; }

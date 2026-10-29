@@ -1,0 +1,69 @@
+import { useEffect, useState } from "react";
+import { AnimatePresence, MotionConfig } from "motion/react";
+import "./components/landing.css";
+import { track } from "./analytics";
+import { FREE_SUMMARY, type Plan } from "./content";
+import { Landing } from "./lp/Landing";
+import { Paywall, Preview, Success } from "./lp/Funnel";
+
+type Stage = "landing" | "preview" | "paywall" | "success";
+
+export default function App() {
+  const [stage, setStage] = useState<Stage>("landing");
+  const [demoSuccess, setDemoSuccess] = useState(false);
+
+  useEffect(() => {
+    // A real checkout redirects back to /?checkout=success&plan=<id>.
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("checkout") === "success") {
+      track("subscription_success", { plan: params.get("plan") ?? undefined });
+      setStage("success");
+      return;
+    }
+    track("landing_page_view", { path: window.location.pathname });
+  }, []);
+
+  const startPreview = () => {
+    track("cta_click", { cta: "explore_free_summary" });
+    track("preview_start", { book: FREE_SUMMARY.book.id });
+    setStage("preview");
+  };
+
+  return (
+    <MotionConfig reducedMotion="user">
+      <AnimatePresence mode="wait">
+        {stage === "landing" && <Landing key="landing" onStart={startPreview} />}
+        {stage === "preview" && (
+          <Preview
+            key="preview"
+            onClose={() => setStage("landing")}
+            onComplete={() => {
+              track("paywall_view", { source: "preview_complete" });
+              setStage("paywall");
+            }}
+          />
+        )}
+        {stage === "paywall" && (
+          <Paywall
+            key="paywall"
+            onClose={() => setStage("landing")}
+            onSubscribed={(_plan: Plan["id"]) => {
+              setDemoSuccess(true);
+              setStage("success");
+            }}
+          />
+        )}
+        {stage === "success" && (
+          <Success
+            key="success"
+            demo={demoSuccess}
+            onRestart={() => {
+              setDemoSuccess(false);
+              setStage("landing");
+            }}
+          />
+        )}
+      </AnimatePresence>
+    </MotionConfig>
+  );
+}

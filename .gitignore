@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.DS_Store
+*.log
+
+# Local backups of earlier landing page versions (not used by the app)
+src/app/App.old.tsx
+src/app/App.story.tsx
+src/app/App.v1.tsx
+src/app/Flow.v1.tsx
