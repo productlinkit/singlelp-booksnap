@@ -1,12 +1,13 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode, type WheelEvent } from "react";
 import { AnimatePresence, motion, type PanInfo } from "motion/react";
-import { ChevronLeft, Lock, Play, X } from "lucide-react";
+import { ChevronLeft, Highlighter, Lock, Play, Square, Volume2, X } from "lucide-react";
 import { track } from "../analytics";
 import { FREE_SUMMARY, SIGN_IN_URL, type Book } from "../content";
 import { APP, BookCover, CtaButton } from "./ui";
 import { screenMotion } from "./Funnel";
 
 const ease = [0.16, 1, 0.3, 1] as const;
+const canSpeak = typeof window !== "undefined" && "speechSynthesis" in window;
 
 /* The free summary, presented like the BookSnap app's reading screen: swipe
    through the pages, then the rest of the summary is behind the paywall. */
@@ -17,17 +18,33 @@ export function Reader({ onClose, onPaywall }: { onClose: () => void; onPaywall:
   const gate = freePages + 1;
   const [[page, dir], setPage] = useState<[number, number]>([0, 1]);
   const [login, setLogin] = useState(false);
-  const [large, setLarge] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
+  const toastTimer = useRef<number | undefined>(undefined);
+  // Highlights the visitor made, per page, and the text currently selected.
+  const [highlights, setHighlights] = useState<Record<number, string[]>>({});
+  const [selection, setSelection] = useState<{ text: string; x: number; y: number; below: boolean } | null>(null);
+  const readingRef = useRef<HTMLDivElement>(null);
+  // Mouse drags select text on desktop; touch swipes turn the page on phones.
+  const [touch] = useState(() => typeof window !== "undefined" && window.matchMedia("(pointer: coarse)").matches);
+  const [speaking, setSpeaking] = useState(false);
+  const [large, setLarge] = useState(false); // "Aa": larger reading text
   const atGate = page === gate;
+
+  const stopSpeech = useCallback(() => {
+    if (canSpeak) window.speechSynthesis.cancel();
+    setSpeaking(false);
+  }, []);
+  useEffect(() => stopSpeech, [stopSpeech]);
 
   const go = useCallback(
     (next: number) => {
       const clamped = Math.max(0, Math.min(gate, next));
       if (clamped === page) return;
+      stopSpeech();
       if (clamped === gate) track("preview_complete", { book: book.id, pages: freePages });
       setPage([clamped, clamped > page ? 1 : -1]);
     },
-    [book.id, freePages, gate, page]
+    [book.id, freePages, gate, page, stopSpeech]
   );
 
   useEffect(() => {
@@ -41,7 +58,65 @@ export function Reader({ onClose, onPaywall }: { onClose: () => void; onPaywall:
     return () => window.removeEventListener("keydown", onKey);
   }, [go, page, onClose, login]);
 
+  // Read the current page aloud with the browser's voice.
+  const listen = () => {
+    if (!canSpeak) return;
+    if (speaking) return stopSpeech();
+    track("feature_use", { feature: "listen", book: book.id });
+    const u = new SpeechSynthesisUtterance(pages[page - 1].join(" "));
+    u.onend = () => setSpeaking(false);
+    window.speechSynthesis.speak(u);
+    setSpeaking(true);
+  };
+
+  const notify = (msg: string) => {
+    setToast(msg);
+    window.clearTimeout(toastTimer.current);
+    toastTimer.current = window.setTimeout(() => setToast(null), 2200);
+  };
+  useEffect(() => () => window.clearTimeout(toastTimer.current), []);
+
+  // Track text the visitor selects inside the summary, to offer "Highlight".
+  useEffect(() => {
+    const onChange = () => {
+      const sel = window.getSelection();
+      const area = readingRef.current;
+      if (!sel || sel.isCollapsed || !area || !sel.rangeCount) return setSelection(null);
+      const range = sel.getRangeAt(0);
+      if (!area.contains(range.commonAncestorContainer)) return setSelection(null);
+      const text = sel.toString().replace(/\s+/g, " ").trim();
+      if (text.length < 3) return setSelection(null);
+      const r = range.getBoundingClientRect();
+      const box = area.getBoundingClientRect();
+      // Above the selection on desktop; below it on touch (the phone's own menu sits above) or when there's no room.
+      const above = r.top - box.top - 10;
+      const below = touch || above < 48;
+      setSelection({ text, x: r.left + r.width / 2 - box.left, y: below ? r.bottom - box.top + 10 : above, below });
+    };
+    document.addEventListener("selectionchange", onChange);
+    return () => document.removeEventListener("selectionchange", onChange);
+  }, [touch]);
+  useEffect(() => setSelection(null), [page]);
+
+  const saveHighlight = () => {
+    if (!selection) return;
+    track("feature_use", { feature: "highlight", book: book.id });
+    setHighlights((h) => ({ ...h, [page]: [...(h[page] ?? []), selection.text] }));
+    window.getSelection()?.removeAllRanges();
+    setSelection(null);
+    notify("Highlight saved.");
+  };
+
+  // Paragraph text with this page's highlights marked in yellow.
+  const marked = (para: string) => {
+    const list = (highlights[page] ?? []).filter((h) => para.includes(h));
+    if (!list.length) return para;
+    const re = new RegExp(`(${list.map((h) => h.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|")})`, "g");
+    return para.split(re).map((part, i) => (list.includes(part) ? <mark key={i} className="rounded-[3px] bg-[#FFE37A] px-0.5 text-inherit">{part}</mark> : part));
+  };
+
   const openLogin = () => {
+    stopSpeech();
     track("feature_use", { feature: "video", book: book.id });
     setLogin(true);
   };
@@ -103,7 +178,7 @@ export function Reader({ onClose, onPaywall }: { onClose: () => void; onPaywall:
         </header>
 
         {/* Reading area: swipe or use the dots / arrow keys */}
-        <div className="relative min-h-0 flex-1 overflow-hidden">
+        <div ref={readingRef} className="relative min-h-0 flex-1 overflow-hidden">
           <AnimatePresence mode="popLayout" initial={false} custom={dir}>
             <motion.article
               key={page}
@@ -112,14 +187,14 @@ export function Reader({ onClose, onPaywall }: { onClose: () => void; onPaywall:
               initial="enter"
               animate="center"
               exit="exit"
-              drag="x"
+              drag={touch ? "x" : false}
               dragDirectionLock
               dragConstraints={{ left: 0, right: 0 }}
               dragElastic={{ left: atGate ? 0.15 : 0.7, right: page === 0 ? 0.15 : 0.7 }}
               dragTransition={{ bounceStiffness: 500, bounceDamping: 35 }}
               onDragEnd={onDragEnd}
               onWheel={onWheel}
-              className={`absolute inset-0 ${page === 0 ? "px-4 pb-1" : "overflow-y-auto px-6 pb-3 pt-2 sm:px-8"}`}
+              className={`absolute inset-0 ${page === 0 ? "px-4 pb-1" : `overflow-y-auto px-6 pt-2 sm:px-8 ${atGate ? "pb-3" : "pb-32"}`}`}
               aria-live="polite"
             >
               {page === 0 ? (
@@ -129,11 +204,57 @@ export function Reader({ onClose, onPaywall }: { onClose: () => void; onPaywall:
               ) : (
                 pages[page - 1].map((para, i) => (
                   <p key={i} className={`${i ? "mt-6" : ""} ${large ? "text-[21px]" : "text-[18px]"} leading-[1.65] transition-[font-size]`}>
-                    {para}
+                    {marked(para)}
                   </p>
                 ))
               )}
             </motion.article>
+          </AnimatePresence>
+
+          {/* Highlight + listen buttons, as in the app (text pages only) */}
+          {page > 0 && !atGate && (
+            <div className="absolute bottom-3 right-4 z-10 flex flex-col gap-3">
+              <RoundButton label="Highlight" onClick={() => (selection ? saveHighlight() : notify("Select any text to highlight it."))} tint="#FFFFFF" shadow pressed={!!selection}>
+                <Highlighter className="size-5" style={{ color: APP.greenDark }} />
+              </RoundButton>
+              {canSpeak && (
+                <RoundButton label={speaking ? "Stop listening" : "Listen to this page"} onClick={listen} tint={APP.yellow} shadow pressed={speaking}>
+                  {speaking ? <Square className="size-4 fill-current" style={{ color: APP.greenDark }} /> : <Volume2 className="size-5" style={{ color: APP.greenDark }} />}
+                </RoundButton>
+              )}
+            </div>
+          )}
+
+          {/* "Highlight" pops up next to selected text */}
+          <AnimatePresence>
+            {selection && (
+              <motion.button
+                type="button"
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={saveHighlight}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                className={`absolute z-30 flex min-h-10 -translate-x-1/2 cursor-pointer items-center gap-1.5 rounded-full bg-forest px-4 text-[14px] font-bold text-white shadow-xl ${selection.below ? "" : "-translate-y-full"}`}
+                style={{ left: Math.min(Math.max(selection.x, 70), (readingRef.current?.clientWidth ?? 400) - 70), top: selection.y }}
+              >
+                <Highlighter aria-hidden className="size-4 text-gold" /> Highlight
+              </motion.button>
+            )}
+          </AnimatePresence>
+
+          <AnimatePresence>
+            {toast && (
+              <motion.div
+                role="status"
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 12 }}
+                className="absolute bottom-3 left-4 z-20 rounded-2xl bg-forest px-4 py-3 text-[14px] font-semibold text-white shadow-xl"
+              >
+                {toast}
+              </motion.div>
+            )}
           </AnimatePresence>
         </div>
 

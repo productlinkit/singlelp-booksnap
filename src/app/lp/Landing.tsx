@@ -14,6 +14,7 @@ const rise = (delay: number) => ({
 
 // The phone tours the app's main screens, so the page shows more than books.
 const SCREENS = [
+  { id: "cover", nav: 0, describe: (b: Book) => `showing the cover of ${b.title}` },
   { id: "read", nav: 0, describe: (b: Book) => `reading the ${b.title} summary` },
   { id: "watch", nav: 0, describe: () => `playing the ${VIDEO_FEED[0].title} video summary` },
   { id: "explore", nav: 1, describe: () => "the Explore tab with search, video summaries and categories" },
@@ -34,7 +35,7 @@ export function Landing({ onStart }: { onStart: () => void }) {
 
   useEffect(() => {
     if (!running) return;
-    const id = setInterval(() => setTick((t) => t + 1), 2500);
+    const id = setInterval(() => setTick((t) => t + 1), 1800);
     return () => clearInterval(id);
   }, [running]);
 
@@ -42,38 +43,37 @@ export function Landing({ onStart }: { onStart: () => void }) {
     <main
       className="relative grid h-dvh w-full overflow-hidden bg-cream text-forest
         [grid-template-areas:'logo'_'copy'_'visual'_'cta'] grid-rows-[auto_auto_minmax(0,1fr)_auto]
-        lg:[grid-template-areas:'logo_visual'_'copy_visual'_'cta_visual'_'rest_visual'] lg:grid-cols-[minmax(0,1.08fr)_minmax(0,1fr)]
-        lg:grid-rows-[auto_minmax(0,1fr)_auto_minmax(0,0.8fr)]"
+        lg:[grid-template-areas:'logo'_'copy'_'cta'_'visual'] lg:grid-rows-[auto_auto_auto_minmax(0,1fr)]"
     >
-      {/* Soft light on the cream side */}
-      <div aria-hidden className="pointer-events-none absolute -left-[20%] -top-[30%] h-[80%] w-[70%] rounded-full bg-white/70 blur-[120px]" />
+      {/* Soft light behind the copy */}
+      <div aria-hidden className="pointer-events-none absolute -left-[20%] -top-[30%] h-[80%] w-[70%] rounded-full bg-white/70 blur-[120px] lg:left-1/2 lg:w-[60%] lg:-translate-x-1/2" />
 
       <motion.img
         {...rise(0)}
         src={LOGO}
         alt="BookSnap"
         className="relative z-10 ml-4 mt-[max(16px,env(safe-area-inset-top))] h-7 w-auto justify-self-start
-          lg:ml-[clamp(40px,5.5vw,112px)] lg:mt-[clamp(28px,5vh,56px)] lg:h-[clamp(28px,3.4vh,38px)]"
+          lg:ml-0 lg:mt-[clamp(20px,3.2vh,40px)] lg:h-[clamp(26px,3.2vh,36px)] lg:justify-self-center"
         style={{ gridArea: "logo" }}
       />
 
       {/* Copy */}
       <section
         className="relative z-10 flex flex-col gap-[clamp(8px,1.2vh,12px)] px-4 pt-[clamp(16px,2.4vh,24px)]
-          lg:self-end lg:gap-[clamp(16px,2.4vh,24px)] lg:pb-[clamp(24px,3.5vh,40px)] lg:pl-[clamp(40px,5.5vw,112px)] lg:pr-[clamp(24px,3vw,64px)] lg:pt-[clamp(24px,4vh,48px)]"
+          lg:items-center lg:gap-[clamp(8px,1.4vh,16px)] lg:px-8 lg:pt-[clamp(14px,2.6vh,32px)] lg:text-center"
         style={{ gridArea: "copy" }}
       >
         <motion.h1
           {...rise(0.08)}
           className="font-display text-[clamp(40px,11.5vw,60px)] font-extrabold leading-[0.98] tracking-[-0.045em] text-forest
-            lg:text-[clamp(60px,min(5.6vw,10.5vh),140px)]"
+            lg:text-[clamp(48px,min(5.4vw,8.4vh),112px)]"
         >
           No Time to Read?
         </motion.h1>
         <motion.p
           {...rise(0.18)}
           className="font-display text-[clamp(19px,5.4vw,24px)] font-bold leading-[1.2] tracking-[-0.02em] text-pine
-            lg:max-w-[18ch] lg:text-[clamp(24px,min(2.3vw,4vh),46px)]"
+            lg:text-[clamp(22px,min(2.1vw,3.6vh),40px)]"
         >
           Get the Best Ideas from Books{" "}
           <span className="relative whitespace-nowrap">
@@ -90,7 +90,7 @@ export function Landing({ onStart }: { onStart: () => void }) {
         <motion.p
           {...rise(0.26)}
           className="hidden max-w-[34ch] text-[15px] leading-[1.55] text-forest/75 [@media(min-height:760px)]:block
-            lg:block lg:text-[clamp(16px,min(1.25vw,2.1vh),22px)]"
+            lg:max-w-[60ch] lg:text-[clamp(15px,min(1.15vw,2vh),20px)]"
         >
           Discover powerful insights, listen anywhere, and learn smarter with BookSnap.
         </motion.p>
@@ -103,14 +103,16 @@ export function Landing({ onStart }: { onStart: () => void }) {
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 1, ease, delay: 0.15 }}
         className="relative z-10 mx-4 mt-[clamp(12px,2vh,20px)] flex min-h-0 flex-col overflow-hidden rounded-[28px] bg-forest
-          lg:m-[clamp(16px,1.2vw,24px)] lg:ml-0 lg:rounded-[clamp(32px,3vw,56px)]"
+          lg:mx-auto lg:mb-[clamp(8px,1.4vh,16px)] lg:mt-[clamp(6px,1.2vh,16px)] lg:w-[min(1280px,calc(100%-48px))] lg:rounded-none lg:bg-transparent"
         style={{ gridArea: "visual" }}
         onMouseEnter={() => setHovering(true)}
         onMouseLeave={() => setHovering(false)}
         onFocus={() => setHovering(true)}
         onBlur={() => setHovering(false)}
       >
-        <div aria-hidden className="pointer-events-none absolute inset-0 bg-[radial-gradient(90%_60%_at_50%_0%,rgba(213,182,109,0.28),transparent_60%),radial-gradient(70%_50%_at_50%_100%,rgba(22,74,55,0.9),transparent_70%)]" />
+        {/* Mobile: green card. Desktop: no card, a soft glow behind the phone on cream. */}
+        <div aria-hidden className="pointer-events-none absolute inset-0 bg-[radial-gradient(90%_60%_at_50%_0%,rgba(213,182,109,0.28),transparent_60%),radial-gradient(70%_50%_at_50%_100%,rgba(22,74,55,0.9),transparent_70%)] lg:hidden" />
+        <div aria-hidden className="pointer-events-none absolute left-1/2 top-1/2 hidden aspect-square h-[115%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(213,182,109,0.45)_0%,rgba(22,74,55,0.12)_42%,transparent_68%)] lg:block" />
         <div
           role="img"
           aria-label={`BookSnap app ${screen.describe(book)}`}
@@ -124,13 +126,13 @@ export function Landing({ onStart }: { onStart: () => void }) {
       <motion.section
         {...rise(0.34)}
         className="relative z-10 flex flex-col items-stretch gap-3 px-4 pb-[max(16px,env(safe-area-inset-bottom))] pt-4
-          lg:items-start lg:self-start lg:gap-4 lg:pb-0 lg:pl-[clamp(40px,5.5vw,112px)] lg:pr-8 lg:pt-2"
+          lg:items-center lg:gap-[clamp(8px,1.4vh,14px)] lg:px-8 lg:pb-0 lg:pt-[clamp(14px,2.6vh,30px)]"
         style={{ gridArea: "cta" }}
       >
-        <CtaButton onClick={onStart} className="w-full px-8 py-[17px] text-[17px] lg:w-auto lg:px-[clamp(32px,2.6vw,48px)] lg:py-[clamp(18px,2.3vh,24px)] lg:text-[clamp(17px,min(1.2vw,2.1vh),22px)]">
+        <CtaButton onClick={onStart} className="w-full px-8 py-[17px] text-[17px] lg:w-auto lg:px-[clamp(32px,2.6vw,48px)] lg:py-[clamp(14px,2vh,22px)] lg:text-[clamp(16px,min(1.15vw,2vh),20px)]">
           Explore a Free Summary
         </CtaButton>
-        <ul className="flex items-center justify-center gap-2 text-[13px] font-semibold text-forest/75 lg:justify-start lg:pl-1 lg:text-[clamp(14px,1.6vh,16px)]" aria-label="Read, listen, ask AI">
+        <ul className="flex items-center justify-center gap-2 text-[13px] font-semibold text-forest/75 lg:text-[clamp(13px,1.6vh,16px)]" aria-label="Read, listen, ask AI">
           <li className="flex items-center gap-1.5"><BookOpen aria-hidden className="size-4 text-gold-ink" />Read</li>
           <li aria-hidden className="text-gold">•</li>
           <li className="flex items-center gap-1.5"><Headphones aria-hidden className="size-4 text-gold-ink" />Listen</li>
@@ -144,7 +146,7 @@ export function Landing({ onStart }: { onStart: () => void }) {
 
 /* Phone + neighbouring covers + floating audio / Ask AI. Everything is sized in
    container units (cqw) of the phone, so the whole scene scales as one piece. On
-   desktop the phone is capped at 42% of the panel width so the chips always fit. */
+   desktop the floating audio / Ask AI chips sit beside the phone, in the wide panel. */
 function ProductScene({ book, screen, tick }: { book: Book; screen: ScreenId; tick: number }) {
   const prev = SHOWCASE[(tick + SHOWCASE.length - 1) % SHOWCASE.length];
   const next = SHOWCASE[(tick + 1) % SHOWCASE.length];
@@ -185,8 +187,7 @@ function ProductScene({ book, screen, tick }: { book: Book; screen: ScreenId; ti
 
       {/* Audio recap */}
       <motion.div
-        className={`absolute left-[-50cqw] top-[56%] hidden items-center gap-[3cqw] rounded-full bg-paper py-[2.6cqw] pl-[2.6cqw] pr-[5cqw] shadow-[0_16px_36px_-12px_rgba(0,0,0,0.5)] ${screen === "read" ? "xl:flex" : ""}`}
-        style={{ fontSize: "clamp(11px, 4.4cqw, 15px)" }}
+        className={`absolute right-[calc(100%+20px)] top-[58%] hidden items-center gap-3 whitespace-nowrap rounded-full bg-paper py-2 pl-2 pr-4 text-[14px] shadow-[0_16px_36px_-12px_rgba(0,0,0,0.5)] ${screen === "read" ? "lg:flex" : ""}`}
         initial={{ opacity: 0, x: -16 }}
         animate={{ opacity: 1, x: 0, y: [0, -6, 0] }}
         transition={{ opacity: { delay: 0.9, duration: 0.6 }, x: { delay: 0.9, duration: 0.6 }, y: { duration: 6, repeat: Infinity, ease: "easeInOut", delay: 1 } }}
@@ -195,15 +196,14 @@ function ProductScene({ book, screen, tick }: { book: Book; screen: ScreenId; ti
           <Play aria-hidden className="size-[1em] fill-current" />
         </span>
         <span className="flex flex-col gap-[0.25em]">
-          <span className="hidden font-bold leading-none text-forest xl:block">Audio Quick Recap</span>
+          <span className="font-bold leading-none text-forest">Audio Quick Recap</span>
           <Waveform bars={12} color="#D5B66D" className="h-[1.3em]" />
         </span>
       </motion.div>
 
       {/* Ask AI (only beside the reading screen; the others speak for themselves) */}
       <motion.div
-        className={`absolute right-[-56cqw] top-[13%] hidden w-[74cqw] rounded-[5cqw] rounded-br-[1.5cqw] bg-paper p-[4.5cqw] shadow-[0_16px_36px_-12px_rgba(0,0,0,0.5)] ${screen === "read" ? "xl:block" : ""}`}
-        style={{ fontSize: "clamp(12px, 4.2cqw, 15px)" }}
+        className={`absolute left-[calc(100%+20px)] top-[12%] hidden w-[clamp(210px,110cqw,280px)] rounded-[20px] rounded-bl-[6px] bg-paper p-4 text-[14px] shadow-[0_16px_36px_-12px_rgba(0,0,0,0.5)] ${screen === "read" ? "lg:block" : ""}`}
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 1.2, duration: 0.7, ease }}
@@ -238,13 +238,15 @@ function Phone({ book, screen }: { book: Book; screen: ScreenId }) {
         <div className="relative min-h-0 flex-1">
           <AnimatePresence mode="wait" initial={false}>
             <motion.div
-              key={screen === "read" ? `${screen}-${book.id}` : screen}
+              key={screen === "read" || screen === "cover" ? `${screen}-${book.id}` : screen}
               className="absolute inset-0 flex flex-col"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.4, ease }}
+              // Cover → summary slides sideways like a swipe; other screens fade up.
+              initial={screen === "read" ? { opacity: 0, x: "35%" } : { opacity: 0, y: 10 }}
+              animate={{ opacity: 1, x: 0, y: 0 }}
+              exit={screen === "cover" ? { opacity: 0, x: "-35%" } : { opacity: 0, y: -8 }}
+              transition={{ duration: 0.25, ease }}
             >
+              {screen === "cover" && <CoverScreen book={book} />}
               {screen === "read" && <ReadScreen book={book} />}
               {screen === "watch" && <WatchScreen />}
               {screen === "explore" && <ExploreScreen />}
@@ -276,41 +278,85 @@ function Phone({ book, screen }: { book: Book; screen: ScreenId }) {
   );
 }
 
+function TopBar() {
+  return (
+    <div className="flex shrink-0 items-center justify-between px-[4cqw] pb-[3cqw]">
+      <span className="grid size-[10cqw] place-items-center rounded-full bg-[#DDE6E1]">
+        <ListFilter aria-hidden className="size-[5cqw]" style={{ color: APP.green }} />
+      </span>
+      <span className="flex rounded-[2.4cqw] p-[1cqw] text-[0.75em] font-bold text-white" style={{ backgroundColor: APP.chrome }}>
+        <span className="rounded-[1.8cqw] px-[4cqw] py-[1.8cqw]" style={{ backgroundColor: APP.green }}>For You</span>
+        <span className="px-[4cqw] py-[1.8cqw]">My Library</span>
+      </span>
+      <span className="grid size-[10cqw] place-items-center rounded-full bg-[#E6F2EC]">
+        <Bell aria-hidden className="size-[5cqw]" style={{ color: APP.green }} />
+      </span>
+    </div>
+  );
+}
+
+function Dots({ active }: { active: number }) {
+  return (
+    <div className="flex shrink-0 justify-center gap-[1.6cqw] py-[2cqw]">
+      {Array.from({ length: 6 }).map((_, i) => (
+        <span key={i} className={`h-[1.8cqw] rounded-full ${i === active ? "w-[6cqw]" : "w-[1.8cqw]"}`} style={{ backgroundColor: i === active ? APP.yellow : "#3a3a3a" }} />
+      ))}
+    </div>
+  );
+}
+
+function ActionBar() {
+  return (
+    <div className="mx-[4cqw] mb-[3cqw] flex shrink-0 items-center justify-around rounded-full py-[2.6cqw]" style={{ backgroundColor: APP.yellow }}>
+      {[Heart, MessageCircle, Share2, Bookmark].map((Icon, i) => (
+        <Icon key={i} aria-hidden className="size-[5.4cqw]" style={{ color: "#2E8B6A", fill: i === 2 ? "none" : "#2E8B6A" }} />
+      ))}
+    </div>
+  );
+}
+
+/* For You feed, first card: the full book cover with "Swipe to Read". */
+function CoverScreen({ book }: { book: Book }) {
+  return (
+    <>
+      <TopBar />
+      <div className="mx-[3cqw] mb-[3cqw] flex min-h-0 flex-1 flex-col overflow-hidden rounded-[5cqw]" style={{ backgroundColor: book.color }}>
+        <img src={book.cover} alt="" className="min-h-0 w-full flex-1 object-contain" />
+        <div className="flex shrink-0 justify-center">
+          <span className="flex items-center gap-[2cqw] rounded-full border-[0.3cqw] border-white/25 bg-black/25 px-[5cqw] py-[2.2cqw] text-[0.85em] font-bold text-white">
+            Swipe to Read
+            <span className="flex">
+              {[0, 1, 2].map((i) => (
+                <ChevronLeft key={i} aria-hidden className="-ml-[1.5cqw] size-[4cqw] first:ml-0" style={{ opacity: 1 - i * 0.3 }} />
+              ))}
+            </span>
+          </span>
+        </div>
+        <Dots active={0} />
+        <ActionBar />
+      </div>
+    </>
+  );
+}
+
+/* Swiped to the summary text, with the video summary card below it. */
 function ReadScreen({ book }: { book: Book }) {
   return (
     <>
-      {/* Top bar: filter · For You / My Library · notifications */}
-      <div className="flex shrink-0 items-center justify-between px-[4cqw] pb-[3cqw]">
-        <span className="grid size-[10cqw] place-items-center rounded-full bg-[#DDE6E1]">
-          <ListFilter aria-hidden className="size-[5cqw]" style={{ color: APP.green }} />
-        </span>
-        <span className="flex rounded-[2.4cqw] p-[1cqw] text-[0.75em] font-bold text-white" style={{ backgroundColor: APP.chrome }}>
-          <span className="rounded-[1.8cqw] px-[4cqw] py-[1.8cqw]" style={{ backgroundColor: APP.green }}>For You</span>
-          <span className="px-[4cqw] py-[1.8cqw]">My Library</span>
-        </span>
-        <span className="grid size-[10cqw] place-items-center rounded-full bg-[#E6F2EC]">
-          <Bell aria-hidden className="size-[5cqw]" style={{ color: APP.green }} />
-        </span>
-      </div>
-
-      <div className="relative min-h-0 flex-1 overflow-hidden px-[7cqw]">
-        <div className="flex items-center gap-[3.5cqw] py-[2cqw]">
-          <div className="w-[13cqw] shrink-0 [perspective:400px]">
-            <motion.div initial={{ rotateY: -40 }} animate={{ rotateY: 0 }} transition={{ duration: 0.7, ease }}>
-              <BookCover book={book} />
-            </motion.div>
+      <TopBar />
+      <div className="relative min-h-0 flex-1 overflow-hidden px-[7cqw] pt-[2cqw]">
+        <p className="leading-[1.55]">{book.excerpt[0]}</p>
+        <div className="mt-[4cqw] flex items-center gap-[2.5cqw] rounded-[4cqw] bg-[#2F6B55] p-[2.4cqw]">
+          <img src={book.cover} alt="" className="w-[9cqw] shrink-0 rounded-[1.2cqw]" />
+          <div className="min-w-0 flex-1 text-white">
+            <div className="truncate text-[0.8em] font-bold">Video summary available</div>
+            <div className="truncate text-[0.65em] text-white/85">Watch visual breakdown now</div>
           </div>
-          <div className="min-w-0">
-            <div className="truncate text-[1.12em] font-extrabold leading-tight">{book.title}</div>
-            <div className="text-[0.85em] opacity-70">{book.author}</div>
-          </div>
+          <span className="flex shrink-0 items-center gap-[1cqw] rounded-full bg-[#F2B705] px-[3cqw] py-[1.6cqw] text-[0.72em] font-bold text-[#1F2A24]">
+            <Play aria-hidden className="size-[2.8cqw] fill-current" /> Play
+          </span>
         </div>
-        {book.excerpt.map((para, i) => (
-          <p key={i} className="mt-[3cqw] leading-[1.55]">{para}</p>
-        ))}
-        {/* Fade text out under the action bar, like a scrolling feed */}
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[16cqw] bg-gradient-to-t from-white to-transparent" />
-        <div className="absolute bottom-[6cqw] right-[3cqw] flex flex-col gap-[3cqw]">
+        <div className="absolute bottom-[4cqw] right-[3cqw] flex flex-col gap-[3cqw]">
           <span className="grid size-[11cqw] place-items-center rounded-full bg-white shadow-[0_2cqw_5cqw_rgba(0,0,0,0.15)]">
             <PenLine aria-hidden className="size-[5cqw]" style={{ color: APP.green }} />
           </span>
@@ -319,17 +365,8 @@ function ReadScreen({ book }: { book: Book }) {
           </span>
         </div>
       </div>
-
-      <div className="flex shrink-0 justify-center gap-[1.6cqw] py-[2cqw]">
-        {Array.from({ length: 5 }).map((_, i) => (
-          <span key={i} className={`h-[1.8cqw] rounded-full ${i === 1 ? "w-[6cqw]" : "w-[1.8cqw]"}`} style={{ backgroundColor: i === 1 ? APP.yellow : "#3a3a3a" }} />
-        ))}
-      </div>
-      <div className="mx-[4cqw] mb-[3cqw] flex shrink-0 items-center justify-around rounded-full py-[2.6cqw]" style={{ backgroundColor: APP.yellow }}>
-        {[Heart, MessageCircle, Share2, Bookmark].map((Icon, i) => (
-          <Icon key={i} aria-hidden className="size-[5.4cqw]" style={{ color: "#2E8B6A", fill: i === 2 ? "none" : "#2E8B6A" }} />
-        ))}
-      </div>
+      <Dots active={1} />
+      <ActionBar />
     </>
   );
 }
@@ -346,7 +383,7 @@ function WatchScreen() {
         className="absolute inset-0 h-full w-full object-cover"
         initial={{ scale: 1 }}
         animate={{ scale: 1.08 }}
-        transition={{ duration: 2.5, ease: "easeInOut" }}
+        transition={{ duration: 1.8, ease: "easeInOut" }}
       />
       <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/70" />
       <span className="absolute left-[4cqw] top-[14cqw] grid size-[9cqw] place-items-center rounded-full bg-[#888B8B]/80">
@@ -356,7 +393,7 @@ function WatchScreen() {
         <Volume2 aria-hidden className="size-[4.6cqw]" />
       </span>
       <div className="absolute inset-x-[4cqw] top-[26cqw] h-[1cqw] overflow-hidden rounded-full bg-white/25">
-        <motion.div className="h-full rounded-full bg-[#EFB100]" initial={{ width: "8%" }} animate={{ width: "45%" }} transition={{ duration: 2.4, ease: "linear" }} />
+        <motion.div className="h-full rounded-full bg-[#EFB100]" initial={{ width: "8%" }} animate={{ width: "45%" }} transition={{ duration: 1.7, ease: "linear" }} />
       </div>
       <div className="absolute inset-x-[5cqw] bottom-[5cqw]">
         <div className="font-bold leading-tight">{video.title}</div>
@@ -435,7 +472,7 @@ function AskScreen() {
           className="ml-[10cqw] self-end rounded-[4cqw] bg-[#3C6E57] px-[3.5cqw] py-[2.5cqw] text-[0.82em] leading-snug text-white"
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2, duration: 0.4 }}
+          transition={{ delay: 0.1, duration: 0.3 }}
         >
           {ask[1].q}
         </motion.div>
@@ -443,7 +480,7 @@ function AskScreen() {
           className="mr-[10cqw] rounded-[4cqw] bg-white px-[3.5cqw] py-[2.5cqw] text-[0.82em] leading-snug"
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6, duration: 0.4 }}
+          transition={{ delay: 0.3, duration: 0.3 }}
         >
           <TypedText text={ask[1].a} />
         </motion.div>
@@ -453,7 +490,7 @@ function AskScreen() {
           className="flex items-center gap-[2cqw] rounded-[4cqw] border-[0.4cqw] border-[#E6B33D] bg-white p-[3cqw]"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.3, duration: 0.4 }}
+          transition={{ delay: 1, duration: 0.3 }}
         >
           <div className="min-w-0 flex-1">
             <div className="text-[0.85em] font-bold">Free limit reached</div>
@@ -527,8 +564,8 @@ function TypedText({ text, className }: { text: string; className?: string }) {
     if (reduce) return;
     let tick: ReturnType<typeof setInterval> | undefined;
     const start = setTimeout(() => {
-      tick = setInterval(() => setN((c) => Math.min(text.length, c + 4)), 20);
-    }, 250);
+      tick = setInterval(() => setN((c) => Math.min(text.length, c + 6)), 16);
+    }, 150);
     return () => {
       clearTimeout(start);
       clearInterval(tick);
