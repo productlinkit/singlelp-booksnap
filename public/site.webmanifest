@@ -1,0 +1,11 @@
+{
+  "name": "BookSnap",
+  "short_name": "BookSnap",
+  "icons": [
+    { "src": "/apple-touch-icon.png", "sizes": "180x180", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ],
+  "theme_color": "#F7F2E8",
+  "background_color": "#F7F2E8",
+  "display": "standalone"
+}

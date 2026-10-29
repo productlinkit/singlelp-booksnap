@@ -3,8 +3,10 @@ import { ArrowRight } from "lucide-react";
 import type { CSSProperties, ReactNode } from "react";
 import type { Book } from "../content";
 
-export const LOGO =
-  "https://lh3.googleusercontent.com/aida-public/AB6AXuBkeISwAl82X1Rirs10VojoJsJGIKaPoPyu_7ohwU2GtxLoL5fQkKq8SrQadgmURAhnPw1dIkuUYXWuyjUOUFKJHQCIZg74yhimGUuGXkKFQKtu-65mZPJ3fyPkzveYOFHtWzaIXUJNWtN2Ub852JLKISSALazX7qsa_tAd2GNI20oXayjmho0eiB_FpntsLUL8vsKt4bFkz7Vxla7syokk06XSv8__CG1kVjxxO0jlij9xURFo2AlSGiaGXFhB8_hZikbLusnhG_dI";
+export const LOGO = "/booksnap-logo.png";
+
+// Colours of the BookSnap mobile app UI (reader, action bar, bottom nav).
+export const APP = { green: "#3E9B78", greenDark: "#237A5B", yellow: "#F2C916", chrome: "#48484B", ink: "#2A2A2A" };
 
 export function CtaButton({
   children,
@@ -64,14 +66,6 @@ export function Waveform({ bars = 14, className = "", color = "currentColor", pl
           style={{ backgroundColor: color, animationDelay: `${(i % 7) * 0.11}s`, transform: playing ? undefined : `scaleY(${0.3 + ((i * 37) % 60) / 100})` }}
         />
       ))}
-    </span>
-  );
-}
-
-export function SampleTag({ className = "" }: { className?: string }) {
-  return (
-    <span className={`inline-flex items-center rounded-full border border-current/50 px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.1em] ${className}`}>
-      Sample content
     </span>
   );
 }

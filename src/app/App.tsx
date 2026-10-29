@@ -4,7 +4,8 @@ import "./components/landing.css";
 import { track } from "./analytics";
 import { FREE_SUMMARY, type Plan } from "./content";
 import { Landing } from "./lp/Landing";
-import { Paywall, Preview, Success } from "./lp/Funnel";
+import { Paywall, Success } from "./lp/Funnel";
+import { Reader } from "./lp/Reader";
 
 type Stage = "landing" | "preview" | "paywall" | "success";
 
@@ -34,11 +35,11 @@ export default function App() {
       <AnimatePresence mode="wait">
         {stage === "landing" && <Landing key="landing" onStart={startPreview} />}
         {stage === "preview" && (
-          <Preview
+          <Reader
             key="preview"
             onClose={() => setStage("landing")}
-            onComplete={() => {
-              track("paywall_view", { source: "preview_complete" });
+            onPaywall={(source) => {
+              track("paywall_view", { source });
               setStage("paywall");
             }}
           />

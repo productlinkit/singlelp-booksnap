@@ -5,6 +5,7 @@ export type FunnelEvent =
   | "cta_click"
   | "preview_start"
   | "preview_complete"
+  | "feature_use"
   | "paywall_view"
   | "checkout_start"
   | "subscription_success";
