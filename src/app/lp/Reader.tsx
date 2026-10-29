@@ -12,25 +12,22 @@ import { screenMotion } from "./Funnel";
 const ease = [0.16, 1, 0.3, 1] as const;
 const canSpeak = typeof window !== "undefined" && "speechSynthesis" in window;
 
-type Note = { page: number; text: string };
 type Sheet = "comments" | "note" | "login" | null;
 
 /* The free summary, presented like the BookSnap app's reading screen. As on
    Deepstash, every feature can be tried for real (like, save, comment,
-   notes, library); what's limited is the reading: after a few free pages the
+   notes); what's limited is the reading: after a few free pages the
    rest of the summary is behind the paywall. Everything a visitor does here
    lives in memory only. */
 export function Reader({ onClose, onPaywall }: { onClose: () => void; onPaywall: (source: string) => void }) {
   const { book, pages, freePages } = FREE_SUMMARY;
   const gate = freePages; // index of the page where the preview stops
   const [[page, dir], setPage] = useState<[number, number]>([0, 1]);
-  const [tab, setTab] = useState<"summary" | "library">("summary");
   const [sheet, setSheet] = useState<Sheet>(null);
   const [speaking, setSpeaking] = useState(false);
   const [large, setLarge] = useState(false);
   const [liked, setLiked] = useState(false);
   const [saved, setSaved] = useState(false);
-  const [notes, setNotes] = useState<Note[]>([]);
   const [comments, setComments] = useState<string[]>([]);
   const [toast, setToast] = useState<string | null>(null);
   const toastTimer = useRef<number | undefined>(undefined);
@@ -62,25 +59,19 @@ export function Reader({ onClose, onPaywall }: { onClose: () => void; onPaywall:
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") return sheet ? setSheet(null) : onClose();
-      if (sheet || tab !== "summary") return;
+      if (sheet) return;
       if (e.key === "ArrowRight") go(page + 1);
       if (e.key === "ArrowLeft") go(page - 1);
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [go, page, onClose, sheet, tab]);
+  }, [go, page, onClose, sheet]);
 
   useEffect(() => () => {
     stopSpeech();
     window.clearTimeout(toastTimer.current);
   }, [stopSpeech]);
 
-  const openTab = (t: typeof tab) => {
-    if (t !== "summary" && t !== tab) used(t);
-    stopSpeech();
-    setSheet(null);
-    setTab(t);
-  };
   const openSheet = (s: Exclude<Sheet, null>) => {
     stopSpeech();
     used(s);
@@ -119,7 +110,7 @@ export function Reader({ onClose, onPaywall }: { onClose: () => void; onPaywall:
   const toggleSave = () => {
     if (!saved) used("save");
     setSaved(!saved);
-    notify(saved ? "Removed from your library." : "Saved to your library.");
+    notify(saved ? "Removed from saved." : "Saved.");
   };
 
   const onDragEnd = (_: unknown, info: PanInfo) => {
@@ -136,21 +127,6 @@ export function Reader({ onClose, onPaywall }: { onClose: () => void; onPaywall:
           <RoundButton label="Close summary" onClick={onClose} tint="#DDE6E1">
             <X className="size-5" style={{ color: APP.greenDark }} />
           </RoundButton>
-          <div role="tablist" aria-label="View" className="flex rounded-[12px] p-1 text-[14px] font-bold text-white" style={{ backgroundColor: APP.chrome }}>
-            {(["summary", "library"] as const).map((t) => (
-              <button
-                key={t}
-                type="button"
-                role="tab"
-                aria-selected={tab === t}
-                onClick={() => openTab(t)}
-                className="cursor-pointer whitespace-nowrap rounded-[9px] px-3 py-2.5 font-bold transition-colors hover:bg-white/10 min-[400px]:px-4"
-                style={tab === t ? { backgroundColor: APP.greenDark } : undefined}
-              >
-                {t === "summary" ? "Summary" : "My Library"}
-              </button>
-            ))}
-          </div>
           <RoundButton label={large ? "Smaller text" : "Larger text"} onClick={() => setLarge((l) => !l)} tint="#E6F2EC" pressed={large}>
             <span className="text-[15px] font-extrabold" style={{ color: APP.greenDark }}>Aa</span>
           </RoundButton>
@@ -158,9 +134,6 @@ export function Reader({ onClose, onPaywall }: { onClose: () => void; onPaywall:
 
         {/* Reading area */}
         <div className="relative min-h-0 flex-1 overflow-hidden">
-          {tab === "library" ? (
-            <Library book={book} saved={saved} notes={notes} onRead={(p) => { setTab("summary"); go(p); }} />
-          ) : (
             <AnimatePresence mode="popLayout" initial={false} custom={dir}>
               <motion.article
                 key={page}
@@ -199,10 +172,9 @@ export function Reader({ onClose, onPaywall }: { onClose: () => void; onPaywall:
                 )}
               </motion.article>
             </AnimatePresence>
-          )}
 
           {/* Floating note + listen buttons, as in the app */}
-          {tab === "summary" && !atGate && (
+          {!atGate && (
             <div className="absolute bottom-4 right-4 z-10 flex flex-col gap-3">
               <RoundButton label="Add a note" onClick={() => openSheet("note")} tint="#FFFFFF" shadow>
                 <PenLine className="size-5" style={{ color: APP.greenDark }} />
@@ -231,40 +203,38 @@ export function Reader({ onClose, onPaywall }: { onClose: () => void; onPaywall:
         </div>
 
         {/* Page navigation: arrows + dots. Dots past the gate are locked. */}
-        {tab === "summary" && (
-          <nav aria-label="Summary pages" className="flex shrink-0 items-center justify-center gap-2 px-4 py-2">
-            <button type="button" onClick={() => go(page - 1)} disabled={page === 0} aria-label="Previous page" className="grid size-11 cursor-pointer place-items-center rounded-full hover:bg-black/5 disabled:cursor-default disabled:opacity-30">
-              <ChevronLeft aria-hidden className="size-5" />
-            </button>
-            <div className="flex items-center">
-              {pages.map((_, i) => {
-                const lockedPage = i > gate;
-                return (
-                  <button
-                    key={i}
-                    type="button"
-                    onClick={() => (lockedPage ? onPaywall("preview_locked_page") : go(i))}
-                    aria-label={lockedPage ? `Page ${i + 1} of ${pages.length}, full access` : `Page ${i + 1} of ${pages.length}`}
-                    aria-current={i === page ? "page" : undefined}
-                    className={`grid h-11 cursor-pointer place-items-center ${i === page ? "w-10" : "w-7"} transition-all`}
-                  >
-                    {lockedPage ? (
-                      <Lock aria-hidden className="size-3" style={{ color: "#8A8A8A" }} />
-                    ) : (
-                      <span className={`block h-2 rounded-full transition-all ${i === page ? "w-6" : "w-2"}`} style={{ backgroundColor: i === page ? APP.yellow : "#8A8A8A" }} />
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-            <button type="button" onClick={() => go(page + 1)} disabled={atGate} aria-label="Next page" className="grid size-11 cursor-pointer place-items-center rounded-full hover:bg-black/5 disabled:cursor-default disabled:opacity-30">
-              <ChevronRight aria-hidden className="size-5" />
-            </button>
-          </nav>
-        )}
+        <nav aria-label="Summary pages" className="flex shrink-0 items-center justify-center gap-2 px-4 py-2">
+          <button type="button" onClick={() => go(page - 1)} disabled={page === 0} aria-label="Previous page" className="grid size-11 cursor-pointer place-items-center rounded-full hover:bg-black/5 disabled:cursor-default disabled:opacity-30">
+            <ChevronLeft aria-hidden className="size-5" />
+          </button>
+          <div className="flex items-center">
+            {pages.map((_, i) => {
+              const lockedPage = i > gate;
+              return (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => (lockedPage ? onPaywall("preview_locked_page") : go(i))}
+                  aria-label={lockedPage ? `Page ${i + 1} of ${pages.length}, full access` : `Page ${i + 1} of ${pages.length}`}
+                  aria-current={i === page ? "page" : undefined}
+                  className={`grid h-11 cursor-pointer place-items-center ${i === page ? "w-10" : "w-7"} transition-all`}
+                >
+                  {lockedPage ? (
+                    <Lock aria-hidden className="size-3" style={{ color: "#8A8A8A" }} />
+                  ) : (
+                    <span className={`block h-2 rounded-full transition-all ${i === page ? "w-6" : "w-2"}`} style={{ backgroundColor: i === page ? APP.yellow : "#8A8A8A" }} />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+          <button type="button" onClick={() => go(page + 1)} disabled={atGate} aria-label="Next page" className="grid size-11 cursor-pointer place-items-center rounded-full hover:bg-black/5 disabled:cursor-default disabled:opacity-30">
+            <ChevronRight aria-hidden className="size-5" />
+          </button>
+        </nav>
 
         {/* Action bar (no counts: there's nothing real to count yet) */}
-        <div className={`mx-4 mb-[max(12px,env(safe-area-inset-bottom))] flex shrink-0 items-center justify-around rounded-full py-1 ${tab === "library" ? "mt-3" : ""}`} style={{ backgroundColor: APP.yellow }}>
+        <div className={`mx-4 mb-[max(12px,env(safe-area-inset-bottom))] flex shrink-0 items-center justify-around rounded-full py-1`} style={{ backgroundColor: APP.yellow }}>
           <ActionButton label="Like" pressed={liked} onClick={toggleLike}>
             <Heart className="size-6" style={{ color: APP.greenDark, fill: liked ? APP.greenDark : "transparent" }} strokeWidth={2.2} />
           </ActionButton>
@@ -272,7 +242,7 @@ export function Reader({ onClose, onPaywall }: { onClose: () => void; onPaywall:
             <MessageCircle className="size-6" style={{ color: APP.greenDark, fill: comments.length ? APP.greenDark : "transparent" }} strokeWidth={2.2} />
           </ActionButton>
           <ActionButton label="Share" onClick={share}><Share2 className="size-6" style={{ color: APP.greenDark }} strokeWidth={2.2} /></ActionButton>
-          <ActionButton label="Save to library" pressed={saved} onClick={toggleSave}>
+          <ActionButton label="Save" pressed={saved} onClick={toggleSave}>
             <Bookmark className="size-6" style={{ color: APP.greenDark, fill: saved ? APP.greenDark : "transparent" }} strokeWidth={2.2} />
           </ActionButton>
         </div>
@@ -284,10 +254,9 @@ export function Reader({ onClose, onPaywall }: { onClose: () => void; onPaywall:
               <Composer
                 placeholder="What stood out to you on this page?"
                 cta="Save note"
-                onSubmit={(text) => {
-                  setNotes((n) => [...n, { page, text }]);
+                onSubmit={() => {
                   setSheet(null);
-                  notify("Note saved to your library.");
+                  notify("Note saved.");
                 }}
               />
               <p className="mt-2 text-[13px] text-[#5F5F5F]">Page {page + 1} of {book.title}</p>
@@ -365,48 +334,6 @@ function Gate({ book, paragraphs, large, left, onUnlock }: { book: Book; paragra
           </a>
         </div>
       </div>
-    </div>
-  );
-}
-
-function Library({ book, saved, notes, onRead }: { book: Book; saved: boolean; notes: Note[]; onRead: (page: number) => void }) {
-  const empty = !saved && !notes.length;
-  return (
-    <div className="h-full overflow-y-auto px-6 pb-6 pt-2 sm:px-8">
-      <h2 className="font-display text-[22px] font-extrabold">My Library</h2>
-      {empty ? (
-        <div className="mt-6 rounded-[24px] bg-[#F2F2F2] p-5 text-center">
-          <Bookmark aria-hidden className="mx-auto size-7" style={{ color: APP.greenDark }} />
-          <p className="mt-3 text-[15px] leading-relaxed text-[#4A4A4A]">Tap the bookmark to save a summary, or the pen to add a note. They'll show up here.</p>
-        </div>
-      ) : (
-        <>
-          {saved && (
-            <button type="button" onClick={() => onRead(0)} className="mt-4 flex w-full cursor-pointer items-center gap-4 rounded-[20px] bg-[#F2F2F2] p-3 text-left hover:bg-[#EAEAEA]">
-              <BookCover book={book} className="w-12 shrink-0" />
-              <span className="min-w-0">
-                <span className="block text-[16px] font-bold">{book.title}</span>
-                <span className="block text-[14px] text-[#5F5F5F]">{book.author}</span>
-              </span>
-            </button>
-          )}
-          {notes.length > 0 && (
-            <>
-              <h3 className="mt-6 text-[13px] font-extrabold uppercase tracking-[0.12em] text-[#5F5F5F]">Notes</h3>
-              <ul className="mt-2 flex flex-col gap-2">
-                {notes.map((n, i) => (
-                  <li key={i}>
-                    <button type="button" onClick={() => onRead(n.page)} className="w-full cursor-pointer rounded-[20px] border border-[#E2E2E2] p-4 text-left hover:bg-[#F7F7F7]">
-                      <span className="block text-[15px] leading-snug">{n.text}</span>
-                      <span className="mt-1.5 block text-[13px] text-[#5F5F5F]">{book.title} · page {n.page + 1}</span>
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </>
-          )}
-        </>
-      )}
     </div>
   );
 }
