@@ -59,6 +59,8 @@ export type Book = {
   title: string;
   author: string;
   cover: string;
+  // Background color of the cover art, used to extend the cover edge to edge.
+  color: string;
   category: string;
   // BookSnap video summary (mp4 URL). While empty, the player shows an animated
   // visual breakdown built from the excerpt instead.
@@ -75,6 +77,7 @@ export const SHOWCASE: Book[] = [
     title: "Zero to One",
     author: "Peter Thiel",
     cover: zeroToOne,
+    color: "#F97216",
     category: "Business",
     video: "",
     excerpt: [
@@ -88,6 +91,7 @@ export const SHOWCASE: Book[] = [
     title: "Atomic Habits",
     author: "James Clear",
     cover: atomicHabits,
+    color: "#13B8A7",
     category: "Self-Improvement",
     video: "",
     excerpt: [
@@ -101,6 +105,7 @@ export const SHOWCASE: Book[] = [
     title: "The Network Effects",
     author: "Meir Valman",
     cover: networkEffects,
+    color: "#0F172A",
     category: "Business",
     video: "",
     excerpt: [
@@ -114,6 +119,7 @@ export const SHOWCASE: Book[] = [
     title: "Call Me by Your Name",
     author: "André Aciman",
     cover: callMeByYourName,
+    color: "#8B5CF6",
     category: "Fiction",
     video: "",
     excerpt: [
@@ -127,6 +133,7 @@ export const SHOWCASE: Book[] = [
     title: "The Time Traveler's Wife",
     author: "Audrey Niffenegger",
     cover: timeTravelersWife,
+    color: "#FBD34D",
     category: "Fiction",
     video: "",
     excerpt: [
