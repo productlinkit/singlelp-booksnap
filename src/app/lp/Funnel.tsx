@@ -1,8 +1,9 @@
 import { useState, type ReactNode } from "react";
 import { motion } from "motion/react";
-import { BookOpen, Check, CircleCheck, Headphones, Sparkles, X } from "lucide-react";
+import { BookOpen, Check, Headphones, Sparkles, X } from "lucide-react";
 import { track } from "../analytics";
-import { APP_URL, CHECKOUT_URL, FREE_SUMMARY, PLANS, TRIAL_DAYS, type Plan } from "../content";
+import { FREE_SUMMARY, PLANS, TRIAL_DAYS, type Plan } from "../content";
+import type { Order } from "./Checkout";
 import { BookCover, CtaButton } from "./ui";
 
 const ease = [0.16, 1, 0.3, 1] as const;
@@ -15,19 +16,16 @@ export const screenMotion = {
 };
 
 /* ── Paywall ───────────────────────────────────────────────────── */
-export function Paywall({ onClose }: { onClose: () => void }) {
-  const [yearly, setYearly] = useState(true);
-  const [planId, setPlanId] = useState<Plan["id"]>("premium");
+export function Paywall({ initial, onClose, onCheckout }: { initial: Order; onClose: () => void; onCheckout: (order: Order) => void }) {
+  const [yearly, setYearly] = useState(initial.billing === "yearly");
+  const [planId, setPlanId] = useState<Plan["id"]>(initial.plan.id);
   const plan = PLANS.find((p) => p.id === planId)!;
   const billing = yearly ? "yearly" : "monthly";
   const terms = yearly ? `${plan.yearlyTotal} billed yearly` : `${plan.monthly} billed monthly`;
 
   const checkout = () => {
     track("checkout_start", { plan: plan.id, billing });
-    const url = new URL(CHECKOUT_URL);
-    url.searchParams.set("plan", plan.id);
-    url.searchParams.set("billing", billing);
-    window.location.href = url.toString();
+    onCheckout({ plan, billing });
   };
 
   return (
@@ -115,27 +113,7 @@ export function Paywall({ onClose }: { onClose: () => void }) {
   );
 }
 
-/* ── Success ───────────────────────────────────────────────────── */
-export function Success() {
-  const start = () => {
-    window.location.href = APP_URL;
-  };
-  return (
-    <motion.div {...screenMotion} role="dialog" aria-modal="true" aria-label="Subscription confirmed" className="fixed inset-0 grid place-items-center overflow-hidden bg-cream px-5 text-forest">
-      <div aria-hidden className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_45%_at_50%_30%,rgba(213,182,109,0.35),transparent_70%)]" />
-      <div className="relative flex w-full max-w-[480px] flex-col items-center text-center">
-        <motion.div initial={{ scale: 0.4, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: "spring", stiffness: 260, damping: 16, delay: 0.15 }}>
-          <CircleCheck aria-hidden className="size-20 text-forest" strokeWidth={1.6} />
-        </motion.div>
-        <h1 className="mt-4 font-display text-[clamp(32px,8vw,48px)] font-extrabold leading-[1.05] tracking-[-0.035em]">You're in.</h1>
-        <p className="mt-3 text-[17px] leading-relaxed text-forest/75">Full access is unlocked. Your {TRIAL_DAYS}-day free trial has started. Your next book is one tap away.</p>
-        <CtaButton onClick={start} className="mt-7 w-full px-8 py-[17px] text-[17px] sm:w-auto">Start Reading</CtaButton>
-      </div>
-    </motion.div>
-  );
-}
-
-function IconButton({ label, onClick, disabled, dark, children }: { label: string; onClick: () => void; disabled?: boolean; dark?: boolean; children: ReactNode }) {
+export function IconButton({ label, onClick, disabled, dark, children }: { label: string; onClick: () => void; disabled?: boolean; dark?: boolean; children: ReactNode }) {
   return (
     <button
       type="button"

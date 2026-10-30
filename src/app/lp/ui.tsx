@@ -27,12 +27,16 @@ export function CtaButton({
   tone = "forest",
   className = "",
   arrow = true,
+  type = "button",
+  disabled = false,
 }: {
   children: ReactNode;
   onClick?: () => void;
   tone?: "forest" | "gold";
   className?: string;
   arrow?: boolean;
+  type?: "button" | "submit";
+  disabled?: boolean;
 }) {
   const colors =
     tone === "forest"
@@ -40,8 +44,9 @@ export function CtaButton({
       : "bg-gold text-forest shadow-[0_18px_40px_-14px_rgba(0,0,0,0.6)] hover:bg-[#e0c482]";
   return (
     <motion.button
-      type="button"
+      type={type}
       onClick={onClick}
+      disabled={disabled}
       whileHover={{ y: -2 }}
       whileTap={{ scale: 0.97, y: 0 }}
       transition={{ type: "spring", stiffness: 420, damping: 26 }}

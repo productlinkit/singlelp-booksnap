@@ -7,11 +7,6 @@ export { default as VIDEO_BANNER } from "../imports/video-summary.jpg";
 import meBeforeYouPoster from "../imports/videos/me-before-you.jpg";
 
 // ── Destinations ─────────────────────────────────────────────────
-// "Start free trial" hands off to BookSnap's own trial sign-up. If a checkout ever
-// redirects back to `/?checkout=success&plan=<id>`, the success screen and event fire.
-export const CHECKOUT_URL = "https://apps.booksnap.ai/en/start-free-trial";
-// Where "Start reading" sends subscribers.
-export const APP_URL = "https://apps.booksnap.ai/en/home";
 // For visitors who already have an account.
 export const SIGN_IN_URL = "https://apps.booksnap.ai/en/sign-in";
 

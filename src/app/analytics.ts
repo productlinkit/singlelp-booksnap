@@ -8,7 +8,9 @@ export type FunnelEvent =
   | "feature_use"
   | "paywall_view"
   | "checkout_start"
-  | "subscription_success";
+  // Not a conversion event: the checkout is frontend only, so tags must not count
+  // these as sales.
+  | "demo_payment_result";
 
 declare global {
   interface Window {
