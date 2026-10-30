@@ -3,6 +3,14 @@ html, body, #root { height: 100%; margin: 0; }
 body { background: #F7F2E8; color: #003625; font-family: "Plus Jakarta Sans", Inter, system-ui, sans-serif; -webkit-font-smoothing: antialiased; overflow: hidden; }
 
 .wave-bar { animation: wave 1.1s ease-in-out infinite; }
+
+/* Landing motion that runs on the compositor (transform only, no repaint). */
+.lp-float { animation: lp-float 7s ease-in-out infinite; will-change: transform; }
+@keyframes lp-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+.lp-drift { animation: lp-drift 10s ease-in-out infinite alternate; will-change: transform; }
+@keyframes lp-drift { from { transform: translateY(-6px); } to { transform: translateY(8px); } }
+.lp-nudge { display: inline-flex; animation: lp-nudge 1.4s ease-in-out infinite; }
+@keyframes lp-nudge { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(-4px); } }
 @keyframes wave { 0%, 100% { transform: scaleY(0.3); } 50% { transform: scaleY(1); } }
 
 .cta-shine::after {
@@ -14,7 +22,7 @@ body { background: #F7F2E8; color: #003625; font-family: "Plus Jakarta Sans", In
 @keyframes cta-shine { 0%, 70% { transform: translateX(-120%); } 100% { transform: translateX(120%); } }
 
 @media (prefers-reduced-motion: reduce) {
-  .wave-bar, .cta-shine::after { animation: none; }
+  .wave-bar, .cta-shine::after, .lp-float, .lp-drift, .lp-nudge { animation: none; }
 }
 
 /* Visible keyboard focus with 3:1+ contrast on both surfaces (WCAG 2.4.7 / 1.4.11) */

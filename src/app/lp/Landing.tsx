@@ -48,19 +48,21 @@ export function Landing({ onStart }: { onStart: () => void }) {
       {/* Soft light behind the copy */}
       <div aria-hidden className="pointer-events-none absolute -left-[20%] -top-[30%] h-[80%] w-[70%] rounded-full bg-white/70 blur-[120px] lg:left-1/2 lg:w-[60%] lg:-translate-x-1/2" />
 
+      <LineArt />
+
       <motion.img
         {...rise(0)}
         src={LOGO}
         alt="BookSnap"
-        className="relative z-10 ml-4 mt-[max(16px,env(safe-area-inset-top))] h-7 w-auto justify-self-start
-          lg:ml-0 lg:mt-[clamp(20px,3.2vh,40px)] lg:h-[clamp(26px,3.2vh,36px)] lg:justify-self-center"
+        className="relative z-10 mt-[max(16px,env(safe-area-inset-top))] h-7 w-auto justify-self-center
+          lg:mt-[clamp(20px,3.2vh,40px)] lg:h-[clamp(26px,3.2vh,36px)]"
         style={{ gridArea: "logo" }}
       />
 
       {/* Copy */}
       <section
-        className="relative z-10 flex flex-col gap-[clamp(8px,1.2vh,12px)] px-4 pt-[clamp(16px,2.4vh,24px)]
-          lg:items-center lg:gap-[clamp(8px,1.4vh,16px)] lg:px-8 lg:pt-[clamp(14px,2.6vh,32px)] lg:text-center"
+        className="relative z-10 flex flex-col items-center gap-[clamp(8px,1.2vh,12px)] px-4 text-center pt-[clamp(10px,1.8vh,20px)]
+          lg:gap-[clamp(8px,1.4vh,16px)] lg:px-8 lg:pt-[clamp(14px,2.6vh,32px)]"
         style={{ gridArea: "copy" }}
       >
         <motion.h1
@@ -102,21 +104,18 @@ export function Landing({ onStart }: { onStart: () => void }) {
         initial={{ opacity: 0, scale: 0.97 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 1, ease, delay: 0.15 }}
-        className="relative z-10 mx-4 mt-[clamp(12px,2vh,20px)] flex min-h-0 flex-col overflow-hidden rounded-[28px] bg-forest
-          lg:mx-auto lg:mb-[clamp(8px,1.4vh,16px)] lg:mt-[clamp(6px,1.2vh,16px)] lg:w-[min(1280px,calc(100%-48px))] lg:rounded-none lg:bg-transparent"
+        className="relative z-10 mx-4 mt-[clamp(4px,1vh,12px)] flex min-h-0 flex-col overflow-hidden
+          lg:mx-auto lg:mb-[clamp(8px,1.4vh,16px)] lg:mt-[clamp(6px,1.2vh,16px)] lg:w-[min(1280px,calc(100%-48px))]"
         style={{ gridArea: "visual" }}
         onMouseEnter={() => setHovering(true)}
         onMouseLeave={() => setHovering(false)}
         onFocus={() => setHovering(true)}
         onBlur={() => setHovering(false)}
       >
-        {/* Mobile: green card. Desktop: no card, a soft glow behind the phone on cream. */}
-        <div aria-hidden className="pointer-events-none absolute inset-0 bg-[radial-gradient(90%_60%_at_50%_0%,rgba(213,182,109,0.28),transparent_60%),radial-gradient(70%_50%_at_50%_100%,rgba(22,74,55,0.9),transparent_70%)] lg:hidden" />
-        <div aria-hidden className="pointer-events-none absolute left-1/2 top-1/2 hidden aspect-square h-[115%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(213,182,109,0.45)_0%,rgba(22,74,55,0.12)_42%,transparent_68%)] lg:block" />
         <div
           role="img"
           aria-label={`BookSnap app ${screen.describe(book)}`}
-          className="relative flex min-h-0 flex-1 items-center justify-center py-[clamp(12px,2vh,24px)] [container-type:size]"
+          className="relative flex min-h-0 flex-1 items-center justify-center py-[clamp(6px,1.2vh,16px)] lg:py-[clamp(12px,2vh,24px)] [container-type:size]"
         >
           <ProductScene book={book} screen={screen.id} tick={tick} />
         </div>
@@ -125,7 +124,7 @@ export function Landing({ onStart }: { onStart: () => void }) {
       {/* CTA */}
       <motion.section
         {...rise(0.34)}
-        className="relative z-10 flex flex-col items-stretch gap-3 px-4 pb-[max(16px,env(safe-area-inset-bottom))] pt-4
+        className="relative z-10 flex flex-col items-stretch gap-3 px-4 pb-[max(16px,env(safe-area-inset-bottom))] pt-2 lg:pt-4
           lg:items-center lg:gap-[clamp(8px,1.4vh,14px)] lg:px-8 lg:pb-0 lg:pt-[clamp(14px,2.6vh,30px)]"
         style={{ gridArea: "cta" }}
       >
@@ -144,6 +143,54 @@ export function Landing({ onStart }: { onStart: () => void }) {
   );
 }
 
+/* Soft ribbon lines so the cream isn't empty: a big loop on the left and a small
+   loop rising on the right. Each has its own weight and drifts at its own pace. The SVG stretches to any screen shape
+   while strokes keep their width. */
+const RIBBONS = [
+  {
+    d: "M -80 300 C 60 180 230 120 300 210 C 370 300 260 400 170 360 C 90 320 120 200 230 190 C 380 175 420 420 330 560 C 260 670 120 720 -80 900",
+    width: "[stroke-width:30px] lg:[stroke-width:clamp(44px,4vw,70px)]",
+    opacity: 0.24,
+    drift: { duration: 9 },
+  },
+  {
+    d: "M 1520 880 C 1380 860 1240 780 1250 660 C 1258 570 1360 560 1370 630 C 1380 700 1290 720 1240 650 C 1170 550 1230 380 1330 300 C 1410 235 1450 140 1420 -40",
+    width: "[stroke-width:22px] lg:[stroke-width:clamp(30px,2.8vw,50px)]",
+    opacity: 0.2,
+    drift: { duration: 11 },
+  },
+];
+
+function LineArt() {
+  return (
+    <div aria-hidden className="pointer-events-none absolute inset-0 z-0">
+      {RIBBONS.map((r, i) => (
+        // Each ribbon is its own GPU layer and drifts with a CSS animation, so the page never repaints for it.
+        <svg
+          key={i}
+          className="lp-drift absolute inset-0 h-full w-full"
+          style={{ animationDuration: `${r.drift.duration}s`, animationDirection: i % 2 ? "alternate-reverse" : "alternate" }}
+          viewBox="0 0 1440 900"
+          preserveAspectRatio="none"
+          fill="none"
+        >
+          <motion.path
+            d={r.d}
+            stroke="#D5B66D"
+            strokeOpacity={r.opacity}
+            strokeLinecap="round"
+            vectorEffect="non-scaling-stroke"
+            className={r.width}
+            initial={{ pathLength: 0 }}
+            animate={{ pathLength: 1 }}
+            transition={{ duration: 1.8, ease, delay: 0.2 + i * 0.3 }}
+          />
+        </svg>
+      ))}
+    </div>
+  );
+}
+
 /* Phone + neighbouring covers + floating audio / Ask AI. Everything is sized in
    container units (cqw) of the phone, so the whole scene scales as one piece. On
    desktop the floating audio / Ask AI chips sit beside the phone, in the wide panel. */
@@ -152,12 +199,12 @@ function ProductScene({ book, screen, tick }: { book: Book; screen: ScreenId; ti
   const next = SHOWCASE[(tick + 1) % SHOWCASE.length];
 
   return (
-    <div className="@container relative aspect-[9/19.5] h-[92%] max-h-[820px] lg:h-auto lg:w-[min(42cqw,calc(86cqh*9/19.5),378px)]">
+    <div className="@container relative aspect-[9/19.5] h-[100%] max-h-[820px] lg:h-auto lg:w-[min(42cqw,calc(86cqh*9/19.5),378px)]">
       {/* Covers peeking out behind the phone */}
       <AnimatePresence initial={false}>
         <motion.div
           key={`l-${prev.id}`}
-          className="absolute left-[-44cqw] top-[18%] w-[50cqw]"
+          className="absolute left-[-44cqw] hidden lg:block top-[18%] w-[50cqw]"
           initial={{ opacity: 0, x: 30, rotate: -4 }}
           animate={{ opacity: 0.8, x: 0, rotate: -11 }}
           exit={{ opacity: 0, x: -30 }}
@@ -167,7 +214,7 @@ function ProductScene({ book, screen, tick }: { book: Book; screen: ScreenId; ti
         </motion.div>
         <motion.div
           key={`r-${next.id}`}
-          className="absolute right-[-44cqw] top-[26%] w-[50cqw]"
+          className="absolute right-[-44cqw] hidden lg:block top-[26%] w-[50cqw]"
           initial={{ opacity: 0, x: 40, rotate: 18 }}
           animate={{ opacity: 0.8, x: 0, rotate: 11 }}
           exit={{ opacity: 0, x: -30 }}
@@ -177,20 +224,16 @@ function ProductScene({ book, screen, tick }: { book: Book; screen: ScreenId; ti
         </motion.div>
       </AnimatePresence>
 
-      <motion.div
-        className="relative h-full w-full"
-        animate={{ y: [0, -8, 0] }}
-        transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
-      >
+      <div className="lp-float relative h-full w-full">
         <Phone book={book} screen={screen} />
-      </motion.div>
+      </div>
 
       {/* Audio recap */}
       <motion.div
         className={`absolute right-[calc(100%+20px)] top-[58%] hidden items-center gap-3 whitespace-nowrap rounded-full bg-paper py-2 pl-2 pr-4 text-[14px] shadow-[0_16px_36px_-12px_rgba(0,0,0,0.5)] ${screen === "read" ? "lg:flex" : ""}`}
         initial={{ opacity: 0, x: -16 }}
-        animate={{ opacity: 1, x: 0, y: [0, -6, 0] }}
-        transition={{ opacity: { delay: 0.9, duration: 0.6 }, x: { delay: 0.9, duration: 0.6 }, y: { duration: 6, repeat: Infinity, ease: "easeInOut", delay: 1 } }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ delay: 0.9, duration: 0.6 }}
       >
         <span className="grid size-[2.3em] place-items-center rounded-full bg-forest text-gold">
           <Play aria-hidden className="size-[1em] fill-current" />
@@ -223,7 +266,7 @@ function ProductScene({ book, screen, tick }: { book: Book; screen: ScreenId; ti
 function Phone({ book, screen }: { book: Book; screen: ScreenId }) {
   const nav = SCREENS.find((s) => s.id === screen)!.nav;
   return (
-    <div className="absolute inset-0 rounded-[15cqw] bg-[#121413] p-[2.6cqw] shadow-[0_40px_80px_-24px_rgba(0,0,0,0.7),inset_0_0_0_1px_rgba(255,255,255,0.08)]">
+    <div className="absolute inset-0 rounded-[15cqw] bg-[#121413] p-[2.6cqw] shadow-[0_14px_28px_-14px_rgba(0,54,37,0.35),inset_0_0_0_1px_rgba(255,255,255,0.08)]">
       <div
         className="relative flex h-full w-full flex-col overflow-hidden rounded-[12.5cqw] transition-colors duration-500"
         style={{ fontSize: "4.7cqw", color: APP.ink, backgroundColor: screen === "watch" ? "#000" : "#fff" }}
@@ -236,7 +279,7 @@ function Phone({ book, screen }: { book: Book; screen: ScreenId }) {
         </div>
 
         <div className="relative min-h-0 flex-1">
-          <AnimatePresence mode="wait" initial={false}>
+          <AnimatePresence initial={false}>
             <motion.div
               key={screen === "read" || screen === "cover" ? `${screen}-${book.id}` : screen}
               className="absolute inset-0 flex flex-col"
@@ -393,7 +436,7 @@ function WatchScreen() {
         <Volume2 aria-hidden className="size-[4.6cqw]" />
       </span>
       <div className="absolute inset-x-[4cqw] top-[26cqw] h-[1cqw] overflow-hidden rounded-full bg-white/25">
-        <motion.div className="h-full rounded-full bg-[#EFB100]" initial={{ width: "8%" }} animate={{ width: "45%" }} transition={{ duration: 1.7, ease: "linear" }} />
+        <motion.div className="h-full w-full origin-left rounded-full bg-[#EFB100]" initial={{ scaleX: 0.08 }} animate={{ scaleX: 0.45 }} transition={{ duration: 1.7, ease: "linear" }} />
       </div>
       <div className="absolute inset-x-[5cqw] bottom-[5cqw]">
         <div className="font-bold leading-tight">{video.title}</div>
@@ -564,7 +607,13 @@ function TypedText({ text, className }: { text: string; className?: string }) {
     if (reduce) return;
     let tick: ReturnType<typeof setInterval> | undefined;
     const start = setTimeout(() => {
-      tick = setInterval(() => setN((c) => Math.min(text.length, c + 6)), 16);
+      tick = setInterval(() => {
+        setN((c) => {
+          const next = Math.min(text.length, c + 6);
+          if (next === text.length) clearInterval(tick); // stop once fully typed
+          return next;
+        });
+      }, 16);
     }, 150);
     return () => {
       clearTimeout(start);

@@ -317,14 +317,9 @@ function Cover({ book, onStart, children }: { book: Book; onStart: () => void; c
           Swipe to Read
           <span aria-hidden className="flex">
             {[0, 1, 2].map((i) => (
-              <motion.span
-                key={i}
-                className="-ml-2 first:ml-0"
-                animate={{ x: [0, -4, 0], opacity: [1 - i * 0.3, 1, 1 - i * 0.3] }}
-                transition={{ duration: 1.4, repeat: Infinity, delay: i * 0.12, ease: "easeInOut" }}
-              >
+              <span key={i} className="lp-nudge -ml-2 first:ml-0" style={{ animationDelay: `${i * 0.12}s`, opacity: 1 - i * 0.3 }}>
                 <ChevronLeft className="size-5" />
-              </motion.span>
+              </span>
             ))}
           </span>
         </button>
