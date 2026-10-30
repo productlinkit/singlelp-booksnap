@@ -1,8 +1,9 @@
-import { useEffect, useState, type CSSProperties } from "react";
+import { useEffect, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { Bell, BookOpen, Bookmark, ChevronLeft, CreditCard, Globe, Headphones, Headset, Heart, Highlighter, House, Info, Lightbulb, ListFilter, LogOut, MessageCircle, MessageCircleQuestion, PenLine, Play, Search, SendHorizontal, Settings, Share2, Sparkles, UserRound, Volume2 } from "lucide-react";
 import profileAvatar from "../../imports/profile-avatar.jpg";
 import { FREE_SUMMARY, SHOWCASE, VIDEO_BANNER, VIDEO_FEED, type Book } from "../content";
+import { Shapes, type FlowerSpot } from "./Flowers";
 import { APP, BookCover, categoryIcon, CtaButton, LOGO, Waveform } from "./ui";
 
 const ease = [0.16, 1, 0.3, 1] as const;
@@ -48,7 +49,7 @@ export function Landing({ onStart }: { onStart: () => void }) {
       {/* Soft light behind the copy */}
       <div aria-hidden className="pointer-events-none absolute -left-[20%] -top-[30%] h-[80%] w-[70%] rounded-full bg-white/70 blur-[120px] lg:left-1/2 lg:w-[60%] lg:-translate-x-1/2" />
 
-      <Shapes />
+      <Shapes flowers={FLOWERS} />
 
       <motion.img
         {...rise(0)}
@@ -143,55 +144,12 @@ export function Landing({ onStart }: { onStart: () => void }) {
   );
 }
 
-/* Soft, organic flowers so the cream isn't empty: four big ones in booksnap.ai's
-   accent colours (yellow, mint, light mint, blush),
-   half hidden past the left and right edges, clear of the text and the phone. */
-
-// One rounded petal, pointing up from the centre (50,50) of a 100×100 box.
-// Long, slim, rounded petal reaching from the centre to the top edge.
-const PETAL = "M50 50 C 44 38 36 24 37 12 C 38 -2 62 -2 63 12 C 64 24 56 38 50 50 Z";
-
-function Flower({ color, petals }: { color: string; petals: number[] }) {
-  return (
-    <g fill={color} fillOpacity={0.55}>
-      {petals.map((len, i) => (
-        <path key={i} d={PETAL} transform={`rotate(${(i * 360) / petals.length} 50 50) translate(50 50) scale(${len}) translate(-50 -50)`} />
-      ))}
-      <circle cx="50" cy="50" r="5" />
-    </g>
-  );
-}
-
-// y = vertical position (% of the page) on phones / desktop; size in px on phones / desktop.
-// `petals` lists each petal's length, so every flower has its own uneven shape.
-const FLOWERS: { color: string; petals: number[]; side: "left" | "right"; y: [number, number]; size: [number, number]; rotate: number }[] = [
+const FLOWERS: FlowerSpot[] = [
   { color: "#B9EED4", petals: [1, 0.62, 0.9, 0.55, 0.8], side: "left", y: [44, 26], size: [210, 480], rotate: 18 },
   { color: "#FFE08F", petals: [0.7, 1, 0.58, 0.88, 0.66], side: "left", y: [84, 84], size: [170, 380], rotate: -10 },
   { color: "#A4F4BF", petals: [0.9, 0.6, 1, 0.64, 0.82], side: "right", y: [34, 22], size: [200, 440], rotate: -24 },
   { color: "#FFDAD6", petals: [0.6, 0.92, 0.7, 1, 0.56], side: "right", y: [74, 76], size: [190, 440], rotate: 40 },
 ];
-
-function Shapes() {
-  return (
-    <div aria-hidden className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
-      {FLOWERS.map((f, i) => (
-        <motion.div
-          key={i}
-          className={`absolute top-[var(--y)] w-[var(--s)] -translate-y-1/2 lg:top-[var(--y-lg)] lg:w-[var(--s-lg)] ${f.side === "left" ? "left-0 -translate-x-1/2" : "right-0 translate-x-1/2"}`}
-          style={{ "--y": `${f.y[0]}%`, "--y-lg": `${f.y[1]}%`, "--s": `${f.size[0]}px`, "--s-lg": `clamp(${Math.round(f.size[1] * 0.75)}px, ${(f.size[1] / 14.4).toFixed(1)}vw, ${Math.round(f.size[1] * 1.3)}px)` } as CSSProperties}
-          initial={{ opacity: 0, scale: 0.6 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1, ease, delay: 0.2 + i * 0.12 }}
-        >
-          {/* Gentle float on the GPU (CSS), different pace per flower */}
-          <svg viewBox="0 0 100 100" className="lp-drift block w-full" style={{ animationDuration: `${9 + i * 1.5}s`, animationDelay: `${-i * 2}s`, rotate: `${f.rotate}deg` }}>
-            <Flower color={f.color} petals={f.petals} />
-          </svg>
-        </motion.div>
-      ))}
-    </div>
-  );
-}
 
 /* Phone + neighbouring covers + floating audio / Ask AI. Everything is sized in
    container units (cqw) of the phone, so the whole scene scales as one piece. On
