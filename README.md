@@ -18,7 +18,7 @@
   | Screen | URL | What it does |
   | --- | --- | --- |
   | Checkout | reached from the Paywall | checks the format of each field, then shows Processing… |
-  | Success | `/?checkout=success&plan=premium&billing=yearly` | Continue Reading goes to `https://apps.booksnap.ai/` |
+  | Success | `/?checkout=success&plan=premium&billing=yearly` | tells the reader to check their email; Sign In to BookSnap goes to `https://apps.booksnap.ai/en/sign-in` |
   | Pending | `/?checkout=pending&plan=premium&billing=yearly` | Check Payment Status leads to Success |
   | Failed | `/?checkout=failed&plan=premium&billing=yearly` | Try Again returns to Checkout |
 

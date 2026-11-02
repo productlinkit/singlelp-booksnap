@@ -1,7 +1,7 @@
 import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 import { motion } from "motion/react";
 import { ArrowLeft, Check, CreditCard, Hourglass, Loader2, X } from "lucide-react";
-import { APP_URL, PLANS, TRIAL_DAYS, type Plan } from "../content";
+import { PLANS, SIGN_IN_URL, TRIAL_DAYS, type Plan } from "../content";
 import { Flower, Shapes, type FlowerSpot } from "./Flowers";
 import { IconButton, screenMotion } from "./Funnel";
 import { SuccessArt } from "./SuccessArt";
@@ -300,7 +300,7 @@ const TONES = {
   pending: { flowers: FLOWERS.pending, badge: BUTTER, ink: "#503D00" },
 };
 
-function StatusScreen({ state, icon, art, title, body, order, children }: { state: PaymentState; icon?: ReactNode; art?: ReactNode; title: string; body: string; order: Order; children: ReactNode }) {
+function StatusScreen({ state, icon, art, details, title, body, order, children }: { state: PaymentState; icon?: ReactNode; art?: ReactNode; details?: ReactNode; title: string; body: string; order: Order; children: ReactNode }) {
   const tone = TONES[state];
   return (
     <motion.div {...screenMotion} className="fixed inset-0 overflow-y-auto bg-cream text-forest">
@@ -327,20 +327,22 @@ function StatusScreen({ state, icon, art, title, body, order, children }: { stat
             <h1 className="mt-5 font-display text-[clamp(30px,8vw,40px)] font-extrabold leading-[1.05] tracking-[-0.035em]">{title}</h1>
             <p className="mt-3 text-[16px] leading-relaxed text-forest/75">{body}</p>
 
-            <dl className="mt-6 w-full rounded-[18px] bg-[#FBF8F1] px-5 py-1 text-[15px]">
-              <div className="flex items-center justify-between gap-4 py-3">
-                <dt className="text-forest/70">Plan</dt>
-                <dd className="font-bold">{order.plan.name}</dd>
-              </div>
-              <div className="flex items-center justify-between gap-4 border-t border-forest/10 py-3">
-                <dt className="text-forest/70">Today</dt>
-                <dd className="font-bold">$0</dd>
-              </div>
-              <div className="flex items-center justify-between gap-4 border-t border-forest/10 py-3">
-                <dt className="text-forest/70">Then</dt>
-                <dd className="font-bold">{priceAfterTrial(order)}</dd>
-              </div>
-            </dl>
+            {details ?? (
+                <dl className="mt-6 w-full rounded-[18px] bg-[#FBF8F1] px-5 py-1 text-[15px]">
+                  <div className="flex items-center justify-between gap-4 py-3">
+                    <dt className="text-forest/70">Plan</dt>
+                    <dd className="font-bold">{order.plan.name}</dd>
+                  </div>
+                  <div className="flex items-center justify-between gap-4 border-t border-forest/10 py-3">
+                    <dt className="text-forest/70">Today</dt>
+                    <dd className="font-bold">$0</dd>
+                  </div>
+                  <div className="flex items-center justify-between gap-4 border-t border-forest/10 py-3">
+                    <dt className="text-forest/70">Then</dt>
+                    <dd className="font-bold">{priceAfterTrial(order)}</dd>
+                  </div>
+                </dl>
+            )}
 
             <div className="mt-6 flex w-full flex-col items-center gap-3">{children}</div>
           </div>
@@ -358,17 +360,36 @@ function SecondaryButton({ onClick, children }: { onClick: () => void; children:
   );
 }
 
+const SIGN_IN_STEPS = [
+  ["Open the email from BookSnap", "Check your spam folder if you don't see it."],
+  ["Copy your temporary password", "It's in the email we just sent you."],
+  ["Sign in to BookSnap", "Use your email and temporary password."],
+];
+
 export function PaymentSuccess({ order }: { order: Order }) {
   return (
     <StatusScreen
       state="success"
       art={<SuccessArt />}
-      title="You're in."
-      body={`Your ${TRIAL_DAYS}-day free trial has started. We've emailed you a temporary password to sign in to BookSnap.`}
+      title="Check your email."
+      body={`Your ${TRIAL_DAYS}-day free trial of ${order.plan.name} has started. We've sent you a temporary password to sign in.`}
       order={order}
+      details={
+        <ol className="mt-6 flex w-full flex-col gap-4 rounded-[18px] bg-[#FBF8F1] p-5 text-left">
+          {SIGN_IN_STEPS.map(([title, hint], i) => (
+            <li key={title} className="flex items-start gap-3.5">
+              <span className="grid size-7 shrink-0 place-items-center rounded-full bg-forest text-[14px] font-bold text-white">{i + 1}</span>
+              <span>
+                <span className="block text-[15px] font-bold leading-snug">{title}</span>
+                <span className="mt-0.5 block text-[14px] leading-snug text-forest/70">{hint}</span>
+              </span>
+            </li>
+          ))}
+        </ol>
+      }
     >
-      <CtaButton onClick={() => window.location.assign(APP_URL)} className="w-full px-8 py-[17px] text-[17px]">
-        Continue Reading
+      <CtaButton onClick={() => window.location.assign(SIGN_IN_URL)} className="w-full px-8 py-[17px] text-[17px]">
+        Sign In to BookSnap
       </CtaButton>
     </StatusScreen>
   );
