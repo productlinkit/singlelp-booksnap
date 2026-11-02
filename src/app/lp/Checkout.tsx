@@ -11,7 +11,8 @@ import { CtaButton, LOGO } from "./ui";
  * ⚠️ THIS CHECKOUT IS FRONTEND ONLY. NOTHING IS CHARGED AND NOTHING IS TAKEN.
  *
  * Email and card values live in this component's state only. They are never stored,
- * never put in the URL, never passed to `track()`, and never sent anywhere. Keep it
+ * never put in the URL, never passed to `track()`, and never sent anywhere. The success
+ * screen shows the email and the card's last four digits, passed in memory. Keep it
  * that way: to take payment for real, use Stripe Elements and redirect back to
  * `/?checkout=<state>&plan=<id>&billing=<period>`, which opens the screens below.
  * See "Payment flow" in the README.
@@ -20,6 +21,8 @@ import { CtaButton, LOGO } from "./ui";
 export type Billing = "monthly" | "yearly";
 export type Order = { plan: Plan; billing: Billing };
 export type PaymentState = "success" | "failed" | "pending";
+/** Who paid. `email` and `last4` stay in memory, so a reloaded screen doesn't have them. */
+export type Buyer = { member: boolean; email?: string; last4?: string };
 
 const ERROR = "#b3261e";
 const PROCESSING_MS = 1800;
@@ -55,7 +58,7 @@ const CARD = "rounded-[28px] border border-white bg-white shadow-[0_32px_80px_-3
 export const DEFAULT_ORDER: Order = { plan: PLANS.find((p) => p.highlight) ?? PLANS[0], billing: "yearly" };
 
 /** Reads `?checkout=<state>&plan=<id>&billing=<period>`, if it is there. */
-export function paymentFromUrl(): { state: PaymentState; order: Order; member: boolean } | null {
+export function paymentFromUrl(): { state: PaymentState; order: Order; buyer: Buyer; orderId: string } | null {
   const params = new URLSearchParams(window.location.search);
   const state = params.get("checkout");
   if (state !== "success" && state !== "failed" && state !== "pending") return null;
@@ -65,9 +68,23 @@ export function paymentFromUrl(): { state: PaymentState; order: Order; member: b
       plan: PLANS.find((p) => p.id === params.get("plan")) ?? DEFAULT_ORDER.plan,
       billing: params.get("billing") === "monthly" ? "monthly" : "yearly",
     },
-    member: params.get("account") === "member",
+    buyer: { member: params.get("account") === "member" },
+    orderId: params.get("order") ?? newOrderId(),
   };
 }
+
+/** Stands in for the ID the backend gives each order. */
+export function newOrderId() {
+  return `BS-${crypto.randomUUID().replace(/-/g, "").slice(0, 8).toUpperCase()}`;
+}
+
+const formatDate = (date: Date) => date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+
+const daysFromNow = (days: number) => {
+  const date = new Date();
+  date.setDate(date.getDate() + days);
+  return date;
+};
 
 const priceAfterTrial = ({ plan, billing }: Order) =>
   billing === "yearly" ? `${plan.yearlyTotal} billed yearly` : `${plan.monthly} billed monthly`;
@@ -174,7 +191,7 @@ function Field({
 }
 
 /* ── Checkout ──────────────────────────────────────────────────── */
-export function Checkout({ order, onBack, onResult }: { order: Order; onBack: () => void; onResult: (state: PaymentState, member: boolean) => void }) {
+export function Checkout({ order, onBack, onResult }: { order: Order; onBack: () => void; onResult: (state: PaymentState, buyer: Buyer) => void }) {
   // Local only. Never stored, never sent. See the note at the top of the file.
   const [values, setValues] = useState<Values>({ email: "", card: "", expiry: "", ccv: "" });
   const [attempted, setAttempted] = useState(false);
@@ -194,9 +211,9 @@ export function Checkout({ order, onBack, onResult }: { order: Order; onBack: ()
 
   useEffect(() => {
     if (!outcome) return undefined;
-    const timer = setTimeout(() => onResult(outcome, member), PROCESSING_MS);
+    const timer = setTimeout(() => onResult(outcome, { member, email, last4: values.card.slice(-4) }), PROCESSING_MS);
     return () => clearTimeout(timer);
-  }, [outcome, member, onResult]);
+  }, [outcome, member, email, values.card, onResult]);
 
   useEffect(() => {
     if (!checking) return undefined;
@@ -366,7 +383,26 @@ const TONES = {
   pending: { flowers: FLOWERS.pending, badge: BUTTER, ink: "#503D00" },
 };
 
-function StatusScreen({ state, icon, art, details, title, body, order, children }: { state: PaymentState; icon?: ReactNode; art?: ReactNode; details?: ReactNode; title: string; body: string; order: Order; children: ReactNode }) {
+function OrderDetails({ order }: { order: Order }) {
+  return (
+    <dl className="mt-6 w-full rounded-[18px] bg-[#FBF8F1] px-5 py-1 text-[15px]">
+      <div className="flex items-center justify-between gap-4 py-3">
+        <dt className="text-forest/70">Plan</dt>
+        <dd className="font-bold">{order.plan.name}</dd>
+      </div>
+      <div className="flex items-center justify-between gap-4 border-t border-forest/10 py-3">
+        <dt className="text-forest/70">Today</dt>
+        <dd className="font-bold">$0</dd>
+      </div>
+      <div className="flex items-center justify-between gap-4 border-t border-forest/10 py-3">
+        <dt className="text-forest/70">Then</dt>
+        <dd className="font-bold">{priceAfterTrial(order)}</dd>
+      </div>
+    </dl>
+  );
+}
+
+function StatusScreen({ state, icon, art, details, aside, title, body, order, children }: { state: PaymentState; icon?: ReactNode; art?: ReactNode; details?: ReactNode; aside?: ReactNode; title: string; body: string; order: Order; children: ReactNode }) {
   const tone = TONES[state];
   return (
     <motion.div {...screenMotion} className="fixed inset-0 overflow-y-auto bg-cream text-forest">
@@ -377,8 +413,8 @@ function StatusScreen({ state, icon, art, details, title, body, order, children 
       <div className="relative flex min-h-full flex-col items-center px-4 pb-[max(20px,env(safe-area-inset-bottom))] pt-[max(18px,env(safe-area-inset-top))] sm:px-6 lg:pt-6">
         <img src={LOGO} alt="BookSnap" className="h-7" />
 
-        <main className="flex w-full flex-1 items-center justify-center py-5 lg:py-8">
-          <div className={`${CARD} flex w-full max-w-[500px] flex-col items-center p-6 text-center sm:p-9`}>
+        <main className={`grid w-full flex-1 content-center justify-items-center gap-4 py-5 lg:py-8 ${aside ? "max-w-[500px] lg:max-w-[980px] lg:grid-cols-[minmax(0,6fr)_minmax(0,5fr)] lg:gap-6" : ""}`}>
+          <div className={`${CARD} flex w-full max-w-[500px] flex-col items-center p-6 text-center sm:p-9 ${aside ? "lg:max-w-none" : ""}`}>
             {art ?? (
               <motion.span
                 className="grid size-[84px] place-items-center rounded-full"
@@ -393,25 +429,11 @@ function StatusScreen({ state, icon, art, details, title, body, order, children 
             <h1 className="mt-5 font-display text-[clamp(30px,8vw,40px)] font-extrabold leading-[1.05] tracking-[-0.035em]">{title}</h1>
             <p className="mt-3 text-[16px] leading-relaxed text-forest/75">{body}</p>
 
-            {details ?? (
-                <dl className="mt-6 w-full rounded-[18px] bg-[#FBF8F1] px-5 py-1 text-[15px]">
-                  <div className="flex items-center justify-between gap-4 py-3">
-                    <dt className="text-forest/70">Plan</dt>
-                    <dd className="font-bold">{order.plan.name}</dd>
-                  </div>
-                  <div className="flex items-center justify-between gap-4 border-t border-forest/10 py-3">
-                    <dt className="text-forest/70">Today</dt>
-                    <dd className="font-bold">$0</dd>
-                  </div>
-                  <div className="flex items-center justify-between gap-4 border-t border-forest/10 py-3">
-                    <dt className="text-forest/70">Then</dt>
-                    <dd className="font-bold">{priceAfterTrial(order)}</dd>
-                  </div>
-                </dl>
-            )}
+            {details === undefined ? <OrderDetails order={order} /> : details}
 
             <div className="mt-6 flex w-full flex-col items-center gap-3">{children}</div>
           </div>
+          {aside}
         </main>
       </div>
     </motion.div>
@@ -432,16 +454,55 @@ const SIGN_IN_STEPS = [
   ["Sign in to BookSnap", "Use your email and temporary password."],
 ];
 
-export function PaymentSuccess({ order, member }: { order: Order; member: boolean }) {
+function OrderReceipt({ order, buyer, orderId }: { order: Order; buyer: Buyer; orderId: string }) {
+  const rows: [string, string | undefined][] = [
+    ["Order ID", orderId],
+    ["Date", formatDate(new Date())],
+    ["Plan", order.plan.name],
+    ["Email", buyer.email],
+    ["Payment method", buyer.last4 && `Card ending ${buyer.last4}`],
+    ["Free trial", `${TRIAL_DAYS} days`],
+  ];
+  return (
+    <section className="relative flex w-full max-w-[500px] flex-col overflow-hidden rounded-[28px] bg-forest p-6 text-left text-white sm:p-9 lg:max-w-none lg:shadow-[0_32px_80px_-32px_rgba(0,54,37,0.6)]">
+      <div aria-hidden className="pointer-events-none absolute inset-0 bg-[radial-gradient(70%_60%_at_100%_0%,rgba(213,182,109,0.26),transparent_70%)]" />
+      <h2 className="relative text-[20px] font-extrabold lg:text-[24px]">Order details</h2>
+
+      <dl className="relative mt-4 text-[15px]">
+        {rows
+          .filter(([, value]) => value)
+          .map(([label, value]) => (
+            <div key={label} className="flex items-baseline justify-between gap-4 border-b border-white/15 py-3">
+              <dt className="shrink-0 text-white/75">{label}</dt>
+              <dd className="min-w-0 break-words text-right font-semibold">{value}</dd>
+            </div>
+          ))}
+      </dl>
+
+      <div className="relative mt-auto pt-6">
+        <p className="flex items-baseline justify-between gap-4">
+          <span className="text-[15px] font-bold">Paid today</span>
+          <span className="font-display text-[34px] font-extrabold leading-none tracking-[-0.03em]">$0</span>
+        </p>
+        <p className="mt-2 text-[14px] leading-snug text-white/75">
+          Then {priceAfterTrial(order)}, starting {formatDate(daysFromNow(TRIAL_DAYS))}.
+        </p>
+      </div>
+    </section>
+  );
+}
+
+export function PaymentSuccess({ order, buyer, orderId }: { order: Order; buyer: Buyer; orderId: string }) {
   const signIn = (
     <CtaButton onClick={() => window.location.assign(SIGN_IN_URL)} className="w-full px-8 py-[17px] text-[17px]">
       Sign In to BookSnap
     </CtaButton>
   );
+  const receipt = <OrderReceipt order={order} buyer={buyer} orderId={orderId} />;
 
-  if (member) {
+  if (buyer.member) {
     return (
-      <StatusScreen state="success" art={<SuccessArt />} title="You're all set." body={`Your ${order.plan.name} subscription is active. Sign in with your email and your existing password.`} order={order}>
+      <StatusScreen state="success" art={<SuccessArt />} aside={receipt} details={null} title="You're all set." body={`Your ${order.plan.name} subscription is active. Sign in with your email and your existing password.`} order={order}>
         {signIn}
       </StatusScreen>
     );
@@ -451,6 +512,7 @@ export function PaymentSuccess({ order, member }: { order: Order; member: boolea
     <StatusScreen
       state="success"
       art={<SuccessArt />}
+      aside={receipt}
       title="Check your email."
       body={`Your ${TRIAL_DAYS}-day free trial of ${order.plan.name} has started. We've sent you a temporary password to sign in.`}
       order={order}

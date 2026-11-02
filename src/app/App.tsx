@@ -3,7 +3,7 @@ import { AnimatePresence, MotionConfig } from "motion/react";
 import "./components/landing.css";
 import { track } from "./analytics";
 import { FREE_SUMMARY } from "./content";
-import { Checkout, DEFAULT_ORDER, PaymentFailed, PaymentPending, PaymentSuccess, paymentFromUrl, type Order, type PaymentState } from "./lp/Checkout";
+import { Checkout, DEFAULT_ORDER, PaymentFailed, PaymentPending, PaymentSuccess, newOrderId, paymentFromUrl, type Buyer, type Order, type PaymentState } from "./lp/Checkout";
 import { Landing } from "./lp/Landing";
 import { Paywall } from "./lp/Funnel";
 import { Reader } from "./lp/Reader";
@@ -11,11 +11,12 @@ import { Reader } from "./lp/Reader";
 type Stage = "landing" | "preview" | "paywall" | "checkout" | PaymentState;
 
 export default function App() {
-  // `/?checkout=<state>&plan=<id>&billing=<period>[&account=member]` opens a result screen directly.
+  // `/?checkout=<state>&plan=<id>&billing=<period>[&order=<id>][&account=member]` opens a result screen directly.
   const [fromUrl] = useState(paymentFromUrl);
   const [stage, setStage] = useState<Stage>(fromUrl?.state ?? "landing");
   const [order, setOrder] = useState<Order>(fromUrl?.order ?? DEFAULT_ORDER);
-  const [member, setMember] = useState(fromUrl?.member ?? false);
+  const [buyer, setBuyer] = useState<Buyer>(fromUrl?.buyer ?? { member: false });
+  const [orderId, setOrderId] = useState<string | null>(fromUrl?.orderId ?? null);
 
   useEffect(() => {
     if (fromUrl) track("demo_payment_result", { state: fromUrl.state, plan: fromUrl.order.plan.id });
@@ -29,17 +30,20 @@ export default function App() {
   };
 
   const showResult = useCallback(
-    (state: PaymentState, isMember: boolean) => {
+    (state: PaymentState, nextBuyer: Buyer) => {
+      const id = orderId ?? newOrderId();
       track("demo_payment_result", { state, plan: order.plan.id, billing: order.billing });
-      window.history.replaceState(null, "", `/?checkout=${state}&plan=${order.plan.id}&billing=${order.billing}${isMember ? "&account=member" : ""}`);
-      setMember(isMember);
+      window.history.replaceState(null, "", `/?checkout=${state}&plan=${order.plan.id}&billing=${order.billing}&order=${id}${nextBuyer.member ? "&account=member" : ""}`);
+      setBuyer(nextBuyer);
+      setOrderId(id);
       setStage(state);
     },
-    [order],
+    [order, orderId],
   );
 
   const leaveResult = (next: Stage) => {
     window.history.replaceState(null, "", "/");
+    setOrderId(null);
     setStage(next);
   };
 
@@ -69,9 +73,9 @@ export default function App() {
           />
         )}
         {stage === "checkout" && <Checkout key="checkout" order={order} onBack={() => setStage("paywall")} onResult={showResult} />}
-        {stage === "success" && <PaymentSuccess key="success" order={order} member={member} />}
+        {stage === "success" && <PaymentSuccess key="success" order={order} buyer={buyer} orderId={orderId ?? ""} />}
         {stage === "failed" && <PaymentFailed key="failed" order={order} onRetry={() => leaveResult("checkout")} onPlans={() => leaveResult("paywall")} />}
-        {stage === "pending" && <PaymentPending key="pending" order={order} onCheck={() => showResult("success", member)} onPlans={() => leaveResult("paywall")} />}
+        {stage === "pending" && <PaymentPending key="pending" order={order} onCheck={() => showResult("success", buyer)} onPlans={() => leaveResult("paywall")} />}
       </AnimatePresence>
     </MotionConfig>
   );
