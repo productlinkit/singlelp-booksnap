@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent, type ReactNode } from "react";
+import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
 import { motion } from "motion/react";
 import { ArrowLeft, Check, CreditCard, Hourglass, Loader2, X } from "lucide-react";
 import { PLANS, SIGN_IN_URL, TRIAL_DAYS, type Plan } from "../content";
@@ -10,8 +10,8 @@ import { CtaButton, LOGO } from "./ui";
 /*
  * ⚠️ THIS CHECKOUT IS FRONTEND ONLY. NOTHING IS CHARGED AND NOTHING IS TAKEN.
  *
- * Card values live in this component's state only. They are never stored, never
- * put in the URL, never passed to `track()`, and never sent anywhere. Keep it
+ * Email and card values live in this component's state only. They are never stored,
+ * never put in the URL, never passed to `track()`, and never sent anywhere. Keep it
  * that way: to take payment for real, use Stripe Elements and redirect back to
  * `/?checkout=<state>&plan=<id>&billing=<period>`, which opens the screens below.
  * See "Payment flow" in the README.
@@ -23,6 +23,7 @@ export type PaymentState = "success" | "failed" | "pending";
 
 const ERROR = "#b3261e";
 const PROCESSING_MS = 1800;
+const CHECK_MS = 600;
 
 const MINT = "#B9EED4";
 const SPRING = "#A4F4BF";
@@ -54,7 +55,7 @@ const CARD = "rounded-[28px] border border-white bg-white shadow-[0_32px_80px_-3
 export const DEFAULT_ORDER: Order = { plan: PLANS.find((p) => p.highlight) ?? PLANS[0], billing: "yearly" };
 
 /** Reads `?checkout=<state>&plan=<id>&billing=<period>`, if it is there. */
-export function paymentFromUrl(): { state: PaymentState; order: Order } | null {
+export function paymentFromUrl(): { state: PaymentState; order: Order; member: boolean } | null {
   const params = new URLSearchParams(window.location.search);
   const state = params.get("checkout");
   if (state !== "success" && state !== "failed" && state !== "pending") return null;
@@ -64,6 +65,7 @@ export function paymentFromUrl(): { state: PaymentState; order: Order } | null {
       plan: PLANS.find((p) => p.id === params.get("plan")) ?? DEFAULT_ORDER.plan,
       billing: params.get("billing") === "monthly" ? "monthly" : "yearly",
     },
+    member: params.get("account") === "member",
   };
 }
 
@@ -84,13 +86,25 @@ const groupExpiry = (v: string) => {
   return d.length > 2 ? `${d.slice(0, 2)}/${d.slice(2)}` : d;
 };
 
-type Values = { name: string; email: string; card: string; expiry: string; ccv: string };
+/** "new" has no account, "member" has one with no subscription, "subscriber" has both. */
+type Account = "new" | "member" | "subscriber";
+
+/** Stands in for the backend's lookup, so each case can be reached. */
+function accountFor(email: string): Account {
+  const address = email.toLowerCase();
+  if (address === "subscriber@example.com") return "subscriber";
+  if (address === "member@example.com") return "member";
+  return "new";
+}
+
+const isEmail = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v);
+
+type Values = { email: string; card: string; expiry: string; ccv: string };
 
 /** Format checks only, in field order. Any 16 digits pass, so no real card is needed. */
-function validate({ name, email, card, expiry, ccv }: Values) {
+function validate({ email, card, expiry, ccv }: Values) {
   const errors: Partial<Record<keyof Values, string>> = {};
-  if (!name.trim()) errors.name = "Enter the name on the card.";
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email.trim())) errors.email = "Enter a valid email.";
+  if (!isEmail(email.trim())) errors.email = "Enter a valid email.";
   if (card.replace(/\D/g, "").length !== 16) errors.card = "Enter all 16 digits.";
   const [mm, yy] = expiry.split("/").map(Number);
   // Day 1 of the following month: a card is good through its expiry month.
@@ -105,6 +119,7 @@ function Field({
   label,
   value,
   onChange,
+  onBlur,
   placeholder,
   error,
   disabled,
@@ -116,6 +131,7 @@ function Field({
   label: string;
   value: string;
   onChange: (value: string) => void;
+  onBlur?: () => void;
   placeholder: string;
   error?: string;
   disabled: boolean;
@@ -136,8 +152,9 @@ function Field({
             data-field={id}
             value={value}
             onChange={(e) => onChange(e.target.value)}
+            onBlur={onBlur}
             placeholder={placeholder}
-            inputMode={numeric ? "numeric" : undefined}
+            inputMode={numeric ? "numeric" : id === "email" ? "email" : undefined}
             maxLength={maxLength}
             disabled={disabled}
             aria-invalid={Boolean(error)}
@@ -157,25 +174,59 @@ function Field({
 }
 
 /* ── Checkout ──────────────────────────────────────────────────── */
-export function Checkout({ order, onBack, onResult }: { order: Order; onBack: () => void; onResult: (state: PaymentState) => void }) {
+export function Checkout({ order, onBack, onResult }: { order: Order; onBack: () => void; onResult: (state: PaymentState, member: boolean) => void }) {
   // Local only. Never stored, never sent. See the note at the top of the file.
-  const [values, setValues] = useState<Values>({ name: "", email: "", card: "", expiry: "", ccv: "" });
+  const [values, setValues] = useState<Values>({ email: "", card: "", expiry: "", ccv: "" });
   const [attempted, setAttempted] = useState(false);
+  const [checking, setChecking] = useState<string | null>(null);
+  const [checked, setChecked] = useState<{ email: string; account: Account } | null>(null);
   const [outcome, setOutcome] = useState<PaymentState | null>(null);
 
   const errors = attempted ? validate(values) : {};
   const processing = outcome !== null;
+  const email = values.email.trim();
+  const account = checked?.account ?? null;
+  const member = account === "member";
+  const subscriber = account === "subscriber";
+  const showCard = account === "new" || member;
+  const formRef = useRef<HTMLFormElement>(null);
   const set = (key: keyof Values) => (value: string) => setValues((v) => ({ ...v, [key]: value }));
 
   useEffect(() => {
     if (!outcome) return undefined;
-    const timer = setTimeout(() => onResult(outcome), PROCESSING_MS);
+    const timer = setTimeout(() => onResult(outcome, member), PROCESSING_MS);
     return () => clearTimeout(timer);
-  }, [outcome, onResult]);
+  }, [outcome, member, onResult]);
+
+  useEffect(() => {
+    if (!checking) return undefined;
+    const timer = setTimeout(() => {
+      setChecked({ email: checking, account: accountFor(checking) });
+      setChecking(null);
+    }, CHECK_MS);
+    return () => clearTimeout(timer);
+  }, [checking]);
+
+  useEffect(() => {
+    if (showCard) formRef.current?.querySelector<HTMLInputElement>('[data-field="card"]')?.focus();
+  }, [showCard]);
+
+  const checkEmail = () => {
+    if (!isEmail(email) || email === checked?.email || email === checking) return;
+    setAttempted(false);
+    setChecking(email);
+  };
 
   const pay = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (processing) return;
+    if (processing || checking) return;
+    if (email !== checked?.email) {
+      if (isEmail(email)) return checkEmail();
+      setAttempted(true);
+      e.currentTarget.querySelector<HTMLInputElement>('[data-field="email"]')?.focus();
+      return;
+    }
+    if (subscriber) return window.location.assign(SIGN_IN_URL);
     setAttempted(true);
     const [firstInvalid] = Object.keys(validate(values));
     if (firstInvalid) {
@@ -199,38 +250,53 @@ export function Checkout({ order, onBack, onResult }: { order: Order; onBack: ()
           <img src={LOGO} alt="BookSnap" className="h-7 justify-self-center" />
         </header>
 
-        <main className="mx-auto mt-4 grid w-full max-w-[560px] flex-1 content-center gap-4 lg:mt-5 lg:max-w-none lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] lg:gap-6">
-          <OrderSummary order={order} />
+        <main className={`mx-auto mt-4 grid w-full max-w-[560px] flex-1 content-center gap-4 lg:mt-5 lg:gap-6 ${subscriber ? "" : "lg:max-w-none lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]"}`}>
+          {!subscriber && <OrderSummary order={order} />}
 
-          <form noValidate onSubmit={pay} className={`${CARD} flex flex-col gap-3.5 p-5 sm:p-7 lg:p-9`}>
-            <h1 className="mb-1 font-display text-[clamp(25px,6.6vw,32px)] font-extrabold leading-tight tracking-[-0.03em]">Payment details</h1>
-            <Field id="name" label="Name on card" placeholder="Alexander Pierce" value={values.name} onChange={set("name")} error={errors.name} disabled={processing} />
-            <Field id="email" label="Email" placeholder="example@email.com" value={values.email} onChange={set("email")} error={errors.email} disabled={processing} />
-            <Field
-              id="card"
-              label="Card number"
-              placeholder="XXXX XXXX XXXX XXXX"
-              value={values.card}
-              onChange={(v) => set("card")(groupCard(v))}
-              error={errors.card}
-              disabled={processing}
-              numeric
-              maxLength={19}
-              trailing={<CreditCard aria-hidden className="size-5 shrink-0 text-forest/70" />}
-            />
-            <div className="grid grid-cols-2 gap-3.5">
-              <Field id="expiry" label="Expiration date" placeholder="MM/YY" value={values.expiry} onChange={(v) => set("expiry")(groupExpiry(v))} error={errors.expiry} disabled={processing} numeric maxLength={5} />
-              <Field id="ccv" label="CCV" placeholder="XXX" value={values.ccv} onChange={(v) => set("ccv")(v.replace(/\D/g, "").slice(0, 4))} error={errors.ccv} disabled={processing} numeric maxLength={4} />
-            </div>
+          <form ref={formRef} noValidate onSubmit={pay} className={`${CARD} flex flex-col justify-center gap-3.5 p-5 sm:p-7 lg:p-9`}>
+            <h1 className="mb-1 font-display text-[clamp(25px,6.6vw,32px)] font-extrabold leading-tight tracking-[-0.03em]">{subscriber ? "Welcome back" : "Payment details"}</h1>
+            <Field id="email" label="Email" placeholder="example@email.com" value={values.email} onChange={set("email")} onBlur={checkEmail} error={errors.email} disabled={processing} />
 
-            <CtaButton type="submit" disabled={processing} arrow={!processing} className="mt-2 w-full px-6 py-[17px] text-[17px]">
-              {processing ? (
+            {showCard && (
+              <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col gap-3.5">
+                <Field
+                  id="card"
+                  label="Card number"
+                  placeholder="XXXX XXXX XXXX XXXX"
+                  value={values.card}
+                  onChange={(v) => set("card")(groupCard(v))}
+                  error={errors.card}
+                  disabled={processing}
+                  numeric
+                  maxLength={19}
+                  trailing={<CreditCard aria-hidden className="size-5 shrink-0 text-forest/70" />}
+                />
+                <div className="grid grid-cols-2 gap-3.5">
+                  <Field id="expiry" label="Expiration date" placeholder="MM/YY" value={values.expiry} onChange={(v) => set("expiry")(groupExpiry(v))} error={errors.expiry} disabled={processing} numeric maxLength={5} />
+                  <Field id="ccv" label="CCV" placeholder="XXX" value={values.ccv} onChange={(v) => set("ccv")(v.replace(/\D/g, "").slice(0, 4))} error={errors.ccv} disabled={processing} numeric maxLength={4} />
+                </div>
+              </motion.div>
+            )}
+
+            {subscriber && (
+              <motion.div role="status" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="rounded-2xl p-4" style={{ backgroundColor: MINT }}>
+                <p className="text-[15px] font-bold">You already have a subscription.</p>
+                <p className="mt-1 text-[14px] leading-snug text-forest/80">There's nothing to pay. Log in to keep reading.</p>
+              </motion.div>
+            )}
+
+            <CtaButton type="submit" disabled={processing || checking !== null} arrow={!processing && !checking} className="mt-2 w-full px-6 py-[17px] text-[17px]">
+              {processing || checking ? (
                 <span className="inline-flex items-center gap-2.5">
                   <Loader2 aria-hidden className="size-5 animate-spin" />
-                  Processing…
+                  {processing ? "Processing…" : "Checking…"}
                 </span>
-              ) : (
+              ) : subscriber ? (
+                "Login"
+              ) : showCard ? (
                 `Start ${TRIAL_DAYS}-Day Free Trial`
+              ) : (
+                "Continue"
               )}
             </CtaButton>
           </form>
@@ -366,7 +432,21 @@ const SIGN_IN_STEPS = [
   ["Sign in to BookSnap", "Use your email and temporary password."],
 ];
 
-export function PaymentSuccess({ order }: { order: Order }) {
+export function PaymentSuccess({ order, member }: { order: Order; member: boolean }) {
+  const signIn = (
+    <CtaButton onClick={() => window.location.assign(SIGN_IN_URL)} className="w-full px-8 py-[17px] text-[17px]">
+      Sign In to BookSnap
+    </CtaButton>
+  );
+
+  if (member) {
+    return (
+      <StatusScreen state="success" art={<SuccessArt />} title="You're all set." body={`Your ${order.plan.name} subscription is active. Sign in with your email and your existing password.`} order={order}>
+        {signIn}
+      </StatusScreen>
+    );
+  }
+
   return (
     <StatusScreen
       state="success"
@@ -388,9 +468,7 @@ export function PaymentSuccess({ order }: { order: Order }) {
         </ol>
       }
     >
-      <CtaButton onClick={() => window.location.assign(SIGN_IN_URL)} className="w-full px-8 py-[17px] text-[17px]">
-        Sign In to BookSnap
-      </CtaButton>
+      {signIn}
     </StatusScreen>
   );
 }

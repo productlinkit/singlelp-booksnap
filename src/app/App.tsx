@@ -11,10 +11,11 @@ import { Reader } from "./lp/Reader";
 type Stage = "landing" | "preview" | "paywall" | "checkout" | PaymentState;
 
 export default function App() {
-  // `/?checkout=<state>&plan=<id>&billing=<period>` opens a result screen directly.
+  // `/?checkout=<state>&plan=<id>&billing=<period>[&account=member]` opens a result screen directly.
   const [fromUrl] = useState(paymentFromUrl);
   const [stage, setStage] = useState<Stage>(fromUrl?.state ?? "landing");
   const [order, setOrder] = useState<Order>(fromUrl?.order ?? DEFAULT_ORDER);
+  const [member, setMember] = useState(fromUrl?.member ?? false);
 
   useEffect(() => {
     if (fromUrl) track("demo_payment_result", { state: fromUrl.state, plan: fromUrl.order.plan.id });
@@ -28,9 +29,10 @@ export default function App() {
   };
 
   const showResult = useCallback(
-    (state: PaymentState) => {
+    (state: PaymentState, isMember: boolean) => {
       track("demo_payment_result", { state, plan: order.plan.id, billing: order.billing });
-      window.history.replaceState(null, "", `/?checkout=${state}&plan=${order.plan.id}&billing=${order.billing}`);
+      window.history.replaceState(null, "", `/?checkout=${state}&plan=${order.plan.id}&billing=${order.billing}${isMember ? "&account=member" : ""}`);
+      setMember(isMember);
       setStage(state);
     },
     [order],
@@ -67,9 +69,9 @@ export default function App() {
           />
         )}
         {stage === "checkout" && <Checkout key="checkout" order={order} onBack={() => setStage("paywall")} onResult={showResult} />}
-        {stage === "success" && <PaymentSuccess key="success" order={order} />}
+        {stage === "success" && <PaymentSuccess key="success" order={order} member={member} />}
         {stage === "failed" && <PaymentFailed key="failed" order={order} onRetry={() => leaveResult("checkout")} onPlans={() => leaveResult("paywall")} />}
-        {stage === "pending" && <PaymentPending key="pending" order={order} onCheck={() => showResult("success")} onPlans={() => leaveResult("paywall")} />}
+        {stage === "pending" && <PaymentPending key="pending" order={order} onCheck={() => showResult("success", member)} onPlans={() => leaveResult("paywall")} />}
       </AnimatePresence>
     </MotionConfig>
   );
