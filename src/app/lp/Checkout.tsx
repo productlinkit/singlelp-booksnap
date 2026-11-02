@@ -1,7 +1,7 @@
 import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 import { motion } from "motion/react";
 import { ArrowLeft, Check, CreditCard, Hourglass, Loader2, X } from "lucide-react";
-import { PLANS, TRIAL_DAYS, type Plan } from "../content";
+import { APP_URL, PLANS, TRIAL_DAYS, type Plan } from "../content";
 import { Flower, Shapes, type FlowerSpot } from "./Flowers";
 import { IconButton, screenMotion } from "./Funnel";
 import { SuccessArt } from "./SuccessArt";
@@ -23,7 +23,6 @@ export type PaymentState = "success" | "failed" | "pending";
 
 const ERROR = "#b3261e";
 const PROCESSING_MS = 1800;
-const REDIRECT_SECONDS = 4;
 
 const MINT = "#B9EED4";
 const SPRING = "#A4F4BF";
@@ -49,18 +48,6 @@ const FLOWERS = {
   failed: paymentFlowers([BLUSH, BUTTER, BLUSH, MINT]),
   pending: paymentFlowers([BUTTER, MINT, BUTTER, BLUSH]),
 };
-
-const METHODS = ["Credit Card", "Stripe"] as const;
-type Method = (typeof METHODS)[number];
-
-/** Stripe's "S" mark, from simple-icons. */
-function StripeLogo() {
-  return (
-    <svg aria-hidden viewBox="0 0 24 24" className="size-5 shrink-0" fill="currentColor">
-      <path d="M13.976 9.15c-2.172-.806-3.356-1.426-3.356-2.409 0-.831.683-1.305 1.901-1.305 2.227 0 4.515.858 6.09 1.631l.89-5.494C18.252.975 15.697 0 12.165 0 9.667 0 7.589.654 6.104 1.872 4.56 3.147 3.757 4.992 3.757 7.218c0 4.039 2.467 5.76 6.476 7.219 2.585.92 3.445 1.574 3.445 2.583 0 .98-.84 1.545-2.354 1.545-1.875 0-4.965-.921-6.99-2.109l-.9 5.555C5.175 22.99 8.385 24 11.714 24c2.641 0 4.843-.624 6.328-1.813 1.664-1.305 2.525-3.236 2.525-5.732 0-4.128-2.524-5.851-6.594-7.305h.003z" />
-    </svg>
-  );
-}
 
 const CARD = "rounded-[28px] border border-white bg-white shadow-[0_32px_80px_-32px_rgba(0,54,37,0.34)]";
 
@@ -100,11 +87,10 @@ const groupExpiry = (v: string) => {
 type Values = { name: string; email: string; card: string; expiry: string; ccv: string };
 
 /** Format checks only, in field order. Any 16 digits pass, so no real card is needed. */
-function validate({ name, email, card, expiry, ccv }: Values, method: Method) {
+function validate({ name, email, card, expiry, ccv }: Values) {
   const errors: Partial<Record<keyof Values, string>> = {};
-  if (method === "Credit Card" && !name.trim()) errors.name = "Enter the name on the card.";
+  if (!name.trim()) errors.name = "Enter the name on the card.";
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email.trim())) errors.email = "Enter a valid email.";
-  if (method !== "Credit Card") return errors;
   if (card.replace(/\D/g, "").length !== 16) errors.card = "Enter all 16 digits.";
   const [mm, yy] = expiry.split("/").map(Number);
   // Day 1 of the following month: a card is good through its expiry month.
@@ -170,41 +156,14 @@ function Field({
   );
 }
 
-function MethodPicker({ method, onChange, disabled }: { method: Method; onChange: (method: Method) => void; disabled: boolean }) {
-  return (
-    <div role="radiogroup" aria-label="Payment method" className="grid grid-cols-2 gap-2.5">
-      {METHODS.map((m) => {
-        const on = m === method;
-        const logo = m === "Stripe" ? <span style={{ color: on ? "#fff" : "#635BFF" }}><StripeLogo /></span> : <CreditCard aria-hidden className="size-5 shrink-0" />;
-        return (
-          <button
-            key={m}
-            type="button"
-            role="radio"
-            aria-checked={on}
-            disabled={disabled}
-            onClick={() => onChange(m)}
-            className={`flex min-h-[54px] cursor-pointer items-center justify-center gap-2 rounded-2xl border-[1.5px] px-2 text-[15px] font-bold transition-colors ${on ? "border-forest bg-forest text-white" : "border-forest/15 bg-[#FBF8F1] text-forest hover:border-forest/40"}`}
-          >
-            {logo}
-            {m}
-          </button>
-        );
-      })}
-    </div>
-  );
-}
-
 /* ── Checkout ──────────────────────────────────────────────────── */
 export function Checkout({ order, onBack, onResult }: { order: Order; onBack: () => void; onResult: (state: PaymentState) => void }) {
   // Local only. Never stored, never sent. See the note at the top of the file.
   const [values, setValues] = useState<Values>({ name: "", email: "", card: "", expiry: "", ccv: "" });
   const [attempted, setAttempted] = useState(false);
   const [outcome, setOutcome] = useState<PaymentState | null>(null);
-  const [method, setMethod] = useState<Method>("Credit Card");
 
-  const isCard = method === "Credit Card";
-  const errors = attempted ? validate(values, method) : {};
+  const errors = attempted ? validate(values) : {};
   const processing = outcome !== null;
   const set = (key: keyof Values) => (value: string) => setValues((v) => ({ ...v, [key]: value }));
 
@@ -218,12 +177,12 @@ export function Checkout({ order, onBack, onResult }: { order: Order; onBack: ()
     e.preventDefault();
     if (processing) return;
     setAttempted(true);
-    const [firstInvalid] = Object.keys(validate(values, method));
+    const [firstInvalid] = Object.keys(validate(values));
     if (firstInvalid) {
       e.currentTarget.querySelector<HTMLInputElement>(`[data-field="${firstInvalid}"]`)?.focus();
       return;
     }
-    setOutcome(isCard ? outcomeFor(values.card) : "success");
+    setOutcome(outcomeFor(values.card));
   };
 
   return (
@@ -245,33 +204,24 @@ export function Checkout({ order, onBack, onResult }: { order: Order; onBack: ()
 
           <form noValidate onSubmit={pay} className={`${CARD} flex flex-col gap-3.5 p-5 sm:p-7 lg:p-9`}>
             <h1 className="mb-1 font-display text-[clamp(25px,6.6vw,32px)] font-extrabold leading-tight tracking-[-0.03em]">Payment details</h1>
-            <MethodPicker method={method} onChange={setMethod} disabled={processing} />
-            {isCard && <Field id="name" label="Name on card" placeholder="Alexander Pierce" value={values.name} onChange={set("name")} error={errors.name} disabled={processing} />}
+            <Field id="name" label="Name on card" placeholder="Alexander Pierce" value={values.name} onChange={set("name")} error={errors.name} disabled={processing} />
             <Field id="email" label="Email" placeholder="example@email.com" value={values.email} onChange={set("email")} error={errors.email} disabled={processing} />
-            {isCard ? (
-              <>
-                <Field
-                  id="card"
-                  label="Card number"
-                  placeholder="XXXX XXXX XXXX XXXX"
-                  value={values.card}
-                  onChange={(v) => set("card")(groupCard(v))}
-                  error={errors.card}
-                  disabled={processing}
-                  numeric
-                  maxLength={19}
-                  trailing={<CreditCard aria-hidden className="size-5 shrink-0 text-forest/70" />}
-                />
-                <div className="grid grid-cols-2 gap-3.5">
-                  <Field id="expiry" label="Expiration date" placeholder="MM/YY" value={values.expiry} onChange={(v) => set("expiry")(groupExpiry(v))} error={errors.expiry} disabled={processing} numeric maxLength={5} />
-                  <Field id="ccv" label="CCV" placeholder="XXX" value={values.ccv} onChange={(v) => set("ccv")(v.replace(/\D/g, "").slice(0, 4))} error={errors.ccv} disabled={processing} numeric maxLength={4} />
-                </div>
-              </>
-            ) : (
-              <p className="rounded-2xl bg-[#FBF8F1] px-4 py-3 text-[14.5px] leading-snug text-forest/80">
-                You&rsquo;ll confirm your {TRIAL_DAYS}-day free trial with {method}.
-              </p>
-            )}
+            <Field
+              id="card"
+              label="Card number"
+              placeholder="XXXX XXXX XXXX XXXX"
+              value={values.card}
+              onChange={(v) => set("card")(groupCard(v))}
+              error={errors.card}
+              disabled={processing}
+              numeric
+              maxLength={19}
+              trailing={<CreditCard aria-hidden className="size-5 shrink-0 text-forest/70" />}
+            />
+            <div className="grid grid-cols-2 gap-3.5">
+              <Field id="expiry" label="Expiration date" placeholder="MM/YY" value={values.expiry} onChange={(v) => set("expiry")(groupExpiry(v))} error={errors.expiry} disabled={processing} numeric maxLength={5} />
+              <Field id="ccv" label="CCV" placeholder="XXX" value={values.ccv} onChange={(v) => set("ccv")(v.replace(/\D/g, "").slice(0, 4))} error={errors.ccv} disabled={processing} numeric maxLength={4} />
+            </div>
 
             <CtaButton type="submit" disabled={processing} arrow={!processing} className="mt-2 w-full px-6 py-[17px] text-[17px]">
               {processing ? (
@@ -280,7 +230,7 @@ export function Checkout({ order, onBack, onResult }: { order: Order; onBack: ()
                   Processing…
                 </span>
               ) : (
-                isCard ? `Start ${TRIAL_DAYS}-Day Free Trial` : `Continue with ${method}`
+                `Start ${TRIAL_DAYS}-Day Free Trial`
               )}
             </CtaButton>
           </form>
@@ -408,32 +358,18 @@ function SecondaryButton({ onClick, children }: { onClick: () => void; children:
   );
 }
 
-export function PaymentSuccess({ order, onHome }: { order: Order; onHome: () => void }) {
-  const [seconds, setSeconds] = useState(REDIRECT_SECONDS);
-
-  useEffect(() => {
-    if (seconds === 0) {
-      onHome();
-      return undefined;
-    }
-    const timer = setTimeout(() => setSeconds((s) => s - 1), 1000);
-    return () => clearTimeout(timer);
-  }, [seconds, onHome]);
-
+export function PaymentSuccess({ order }: { order: Order }) {
   return (
     <StatusScreen
       state="success"
       art={<SuccessArt />}
       title="You're in."
-      body={`Full access is unlocked. Your ${TRIAL_DAYS}-day free trial has started. Your next book is one tap away.`}
+      body={`Your ${TRIAL_DAYS}-day free trial has started. We've emailed you a temporary password to sign in to BookSnap.`}
       order={order}
     >
-      <CtaButton onClick={onHome} className="w-full px-8 py-[17px] text-[17px]">
-        Start Reading
+      <CtaButton onClick={() => window.location.assign(APP_URL)} className="w-full px-8 py-[17px] text-[17px]">
+        Continue Reading
       </CtaButton>
-      <p role="status" className="text-[14px] text-forest/75">
-        Taking you to Home in {seconds}s…
-      </p>
     </StatusScreen>
   );
 }
